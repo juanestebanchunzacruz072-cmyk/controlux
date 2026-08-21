@@ -4,9 +4,7 @@ session_start();
 
 include '../views/layouts/header.php'; 
 ?>
-
-<!-- Hero Banner -->
-<section class="hero-section text-center text-white d-flex align-items-center justify-content-center position-relative overflow-hidden" style="min-height: 60vh;">
+<section class="hero-section text-center text-white d-flex align-items-center justify-content-center position-relative overflow-hidden" style="min-height: 90vh; margin-top: -24px;">
     <!-- Video Background -->
     <video autoplay muted loop playsinline class="position-absolute w-100 h-100" style="object-fit: cover; z-index: -2; top: 0; left: 0;">
         <source src="../img/videos/relojes.mp4" type="video/mp4">

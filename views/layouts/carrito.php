@@ -1,4 +1,4 @@
-﻿<!-- Cart Offcanvas -->
+<!-- Cart Offcanvas -->
 <div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel">
     <div class="offcanvas-header d-flex justify-content-between align-items-center">
         <h6 class="offcanvas-title mb-0" id="cartOffcanvasLabel" style="font-weight: 800; letter-spacing: 1px;">
@@ -120,7 +120,7 @@
             document.querySelectorAll('.cart-item').forEach(item => {
                 items.push({
                     id: parseInt(item.getAttribute('data-id')),
-                    name: item.querySelector('.cart-item-title').innerText,
+                    name: item.querySelector('.cart-item-title').textContent,
                     price: parseFloat(item.getAttribute('data-price')),
                     quantity: parseInt(item.querySelector('.item-quantity').value),
                     stock: parseInt(item.getAttribute('data-stock')) || Infinity,
@@ -268,7 +268,7 @@
                 document.querySelectorAll('.cart-item').forEach(item => {
                     items.push({
                         id: parseInt(item.getAttribute('data-id')),
-                        name: item.querySelector('.cart-item-title').innerText,
+                        name: item.querySelector('.cart-item-title').textContent,
                         price: parseFloat(item.getAttribute('data-price')),
                         quantity: parseInt(item.querySelector('.item-quantity').value),
                         img: item.querySelector('img').getAttribute('src')

@@ -12,4 +12,4 @@ try {
 } catch (PDOException $e) {
     die("Error de Conexion: " . $e->getMessage());
 }
-?>
+

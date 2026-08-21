@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 
 if (!isset($_SESSION['id_usuario']) || $_SESSION['usuario']['id_rol'] != '1') {
@@ -147,16 +147,16 @@ try {
                                     </span>
                                 </td>
                                 <td>
-                                    <form action="../../controllers/Admin/PedidoController.php?accion=cambiarEstado" method="POST" class="d-flex align-items-center">
+                                    <form action="../../controllers/Admin/PedidoController.php?accion=cambiarEstado" method="POST" style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 5px; margin: 0; padding: 0;">
                                         <input type="hidden" name="id_pedido" value="<?php echo $p['id_pedido']; ?>">
-                                        <select name="id_estado" class="select-estado">
+                                        <select name="id_estado" class="select-estado" style="margin: 0; flex-shrink: 1;">
                                             <?php foreach ($estados as $est): ?>
                                                 <option value="<?php echo $est['id_estado']; ?>" <?php echo ($est['id_estado'] == $p['id_estado']) ? 'selected' : ''; ?>>
                                                     <?php echo htmlspecialchars($est['nombre']); ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
-                                        <button type="submit" class="btn-update"><i class="bi bi-check2"></i></button>
+                                        <button type="submit" class="btn-update" style="margin: 0; flex-shrink: 0;"><i class="bi bi-check2"></i></button>
                                     </form>
                                 </td>
                             </tr>

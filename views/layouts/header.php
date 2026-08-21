@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -88,6 +88,4 @@ if (session_status() === PHP_SESSION_NONE) {
             </div>
         </div>
     </div>
-</nav>
-
-<?php include __DIR__ . '/carrito.php'; ?>
+</nav><?php include __DIR__ . '/carrito.php'; ?>

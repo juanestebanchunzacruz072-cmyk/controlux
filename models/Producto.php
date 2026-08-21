@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/../config/database.php';
 
 class Producto
@@ -179,4 +179,4 @@ class Producto
         return $this->conn;
     }
 }
-?>
+
