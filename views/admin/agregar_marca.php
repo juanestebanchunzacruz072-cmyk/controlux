@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['id_usuario']) || $_SESSION['usuario']['id_rol'] != '1') {
     header("Location: ../auth/login.php");
@@ -287,8 +287,8 @@ $marcasList = $marcaModel->obtenerTodas();
                 div.className = 'form-check';
                 div.style.marginBottom = '5px';
                 div.innerHTML = `
-                    <input class="form-check-input" type="checkbox" name="subcategorias[]" value="${sub.id_subcategoria}" id="edit_sub_${sub.id_subcategoria}" ${isChecked} style="background-color: #222; border-color: #444;">
-                    <label class="form-check-label" style="cursor: pointer; width: 100%; color: white;" for="edit_sub_${sub.id_subcategoria}">${sub.nombre}</label>
+                    <input class="form-check-input" type="checkbox" name="subcategorias[]" value="${sub.id_subcategoria}" id="edit_sub_${sub.id_subcategoria}" ${isChecked}>
+                    <label class="form-check-label" style="cursor: pointer; width: 100%; color: #333;" for="edit_sub_${sub.id_subcategoria}">${sub.nombre}</label>
                 `;
                 // Una vez renderizado con checked, lo quitamos de la lista base de DB para que el usuario pueda desmarcarlo
                 if (currentEditSubcategorias.includes(subStr)) {
