@@ -28,7 +28,7 @@ try {
                 <div class="col">
                     <div class="card h-100 product-card open-product-modal" style="cursor: pointer;" data-desc="<?php echo htmlspecialchars($p['descripcion'] ?? 'Sin descripción'); ?>" data-brand="<?php echo htmlspecialchars($p['marca'] ?? 'Desconocida'); ?>" data-stock="<?php echo $p['stock']; ?>">
                         <div class="p-3 d-flex justify-content-center align-items-center" style="height: 250px;">
-                            <img src="/controlux/<?php echo htmlspecialchars(ltrim($p['url_imagen'] ?? 'img/relojes/Audemars-Piguet-Royal.webp', '/')); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($p['nombre']); ?>" style="max-height: 100%; width: auto; object-fit: contain;">
+                            <img src="/controlux/<?php echo htmlspecialchars(ltrim($p['img'] ?? 'img/relojes/Audemars-Piguet-Royal.webp', '/')); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($p['nombre']); ?>" style="max-height: 100%; width: auto; object-fit: contain;">
                         </div>
                         <div class="card-body d-flex flex-column text-center">
                             <h5 class="card-title mb-3"><?php echo htmlspecialchars($p['nombre']); ?></h5>
@@ -40,7 +40,7 @@ try {
                                         data-name="<?php echo htmlspecialchars($p['nombre']); ?>" 
                                         data-price="<?php echo $p['precio']; ?>" 
                                         data-stock="<?php echo $p['stock']; ?>" 
-                                        data-img="/controlux/<?php echo htmlspecialchars(ltrim($p['url_imagen'] ?? 'img/relojes/Audemars-Piguet-Royal.webp', '/')); ?>">
+                                        data-img="/controlux/<?php echo htmlspecialchars(ltrim($p['img'] ?? 'img/relojes/Audemars-Piguet-Royal.webp', '/')); ?>">
                                     <i class="bi bi-cart-plus me-2"></i>Agregar al carrito
                                 </button>
                             <?php else: ?>

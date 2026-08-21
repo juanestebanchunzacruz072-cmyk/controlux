@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (isset($_SESSION['id_usuario'])) {
     if ($_SESSION['usuario']['id_rol'] == '1') {

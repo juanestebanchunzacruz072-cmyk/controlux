@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['id_usuario']) || $_SESSION['usuario']['id_rol'] != '1') {
     header("Location: ../auth/login.php");
@@ -135,7 +135,7 @@ $marcasList = $marcaModel->obtenerTodas();
                                             
                                             <?php if(isset($m['activo']) && $m['activo'] == 1): ?>
                                             <a href="../../controllers/Admin/MarcaController.php?accion=ocultar&id=<?php echo $m['id_marca']; ?>" class="btn btn-sm" 
-                                                style="background-color: #0a0a0a; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-weight: 500; text-decoration: none;" title="Ocultar">
+                                                style="background-color: #6c757d; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-weight: 500; text-decoration: none;" title="Ocultar">
                                                 <i class="bi bi-eye-slash"></i>
                                             </a>
                                             <?php else: ?>

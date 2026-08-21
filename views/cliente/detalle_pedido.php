@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 
 // Si no hay carrito, volver al index

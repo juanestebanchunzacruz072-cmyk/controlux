@@ -39,7 +39,6 @@ $stmt = $conn->query("
     FROM productos p 
     LEFT JOIN categorias c ON p.id_categoria = c.id_categoria 
     LEFT JOIN subcategoria s ON p.id_subcategoria = s.id_subcategoria
-    LEFT JOIN imagen_producto i ON p.id_producto = i.id_producto AND i.principal = 1
     ORDER BY p.id_producto DESC LIMIT 4
 ");
 $productos_recientes = $stmt->fetchAll();

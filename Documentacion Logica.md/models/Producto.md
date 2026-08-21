@@ -32,18 +32,17 @@ public function obtenerPorCategoria(int $id_categoria) {
 }
 ```
 - **Propósito:** Trae todos los productos de una categoría (ej. 1=Relojes) que estén activos (`p.activo = 1`).
-- **`LEFT JOIN`**: Cruza la información con la tabla `imagen_producto` para traer únicamente la foto marcada como `principal = 1`.
+
 - **Ejecución Segura:** Utiliza `prepare()` y `execute([$id_categoria])` (bind param) para prevenir inyecciones SQL si el `$id_categoria` fuera manipulado.
 
 #### 3. Método `obtenerRecomendaciones($limite)`
 ```php
 public function obtenerRecomendaciones(int $limite = 4) {
     $stmt = $this->conn->query("
-        SELECT p.id_producto, p.nombre, p.precio, i.url_imagen 
-        FROM productos p 
-        LEFT JOIN imagen_producto i ON p.id_producto = i.id_producto AND i.principal = 1
-        WHERE p.activo = 1
-        ORDER BY RAND() LIMIT $limite
+        SELECT p.id_producto, p.nombre, p.precio, p.stock, p.url_imagen 
+    FROM productos p
+    WHERE p.activo = 1 AND p.stock > 0 
+    ORDER BY RAND() LIMIT :limite
     ");
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }

@@ -1,4 +1,4 @@
-<?php include '../../../../views/layouts/header.php'; ?>
+﻿<?php include '../../../../views/layouts/header.php'; ?>
 
 <!-- Categories Section -->
 <section id="categorias" class="categories-section container my-5 position-relative">

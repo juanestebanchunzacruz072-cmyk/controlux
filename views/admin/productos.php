@@ -35,12 +35,11 @@ try {
     $marcas_cat_lista = $conn->query("SELECT DISTINCT id_marca, id_categoria FROM productos WHERE id_marca IS NOT NULL AND id_categoria IS NOT NULL")->fetchAll(PDO::FETCH_ASSOC);
 
     $sql_productos = "
-        SELECT p.*, c.nombre as categoria, s.nombre as subcategoria, m.nombre as marca, i.url_imagen 
+        SELECT p.*, c.nombre as categoria, s.nombre as subcategoria, m.nombre as marca 
         FROM productos p 
         LEFT JOIN categorias c ON p.id_categoria = c.id_categoria 
         LEFT JOIN subcategoria s ON p.id_subcategoria = s.id_subcategoria
         LEFT JOIN marcas m ON p.id_marca = m.id_marca
-        LEFT JOIN imagen_producto i ON p.id_producto = i.id_producto AND i.principal = 1
         WHERE 1=1
     ";
     
@@ -181,8 +180,8 @@ try {
                             <tr>
                                 <td>#<?php echo $p['id_producto']; ?></td>
                                 <td>
-                                    <?php if (!empty($p['url_imagen'])): ?>
-                                        <img src="../../<?php echo htmlspecialchars($p['url_imagen']); ?>" class="table-img" style="width: 50px; height: 50px; object-fit: contain;">
+                                    <?php if (!empty($p['img'])): ?>
+                                        <img src="../../<?php echo htmlspecialchars($p['img']); ?>" class="table-img" style="width: 50px; height: 50px; object-fit: contain;">
                                     <?php else: ?>
                                         <div class="table-img d-flex align-items-center justify-content-center bg-light" style="width: 50px; height: 50px;">
                                             <i class="bi bi-image text-muted"></i>
@@ -219,28 +218,28 @@ try {
                                 </td>
                                 <td style="text-align: center; vertical-align: middle;">
                                     <div style="display: flex; gap: 6px; justify-content: center; align-items: center;">
-                                        <a href="../../controllers/Admin/ProductoController.php?accion=vista_editar&id=<?php echo $p['id_producto']; ?>" 
-                                            style="background-color: #0d6efd; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-weight: 500; text-decoration: none;" title="Editar">
+                                        <button type="button" onclick='abrirModalEditarProducto(<?php echo htmlspecialchars(json_encode($p), ENT_QUOTES, "UTF-8"); ?>)' 
+                                            style="background-color: #D4AF37; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-weight: 500; text-decoration: none;" title="Editar">
                                             <i class="bi bi-pencil-square"></i>
-                                        </a>
+                                        </button>
                                         
-                                        <form action="../../controllers/Admin/ProductoController.php?accion=toggleStatus" method="POST" class="d-inline" style="margin: 0;">
+                                        <form action="../../controllers/Admin/ProductoController.php?accion=toggleStatus" method="POST" class="d-inline" style="margin: 0;" <?php if ($p['activo'] == 1) echo 'onsubmit="confirmarDesactivacion(event, this)"'; ?>>
                                             <input type="hidden" name="id_producto" value="<?php echo $p['id_producto']; ?>">
                                             <input type="hidden" name="estado_actual" value="<?php echo $p['activo']; ?>">
                                             <?php if ($p['activo'] == 1): ?>
                                                 <button type="submit" 
-                                                    style="background-color: #6c757d; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-weight: 500;" title="Ocultar" onclick="return confirm('¿Seguro que deseas desactivar este producto?');">
+                                                    style="background-color: #6c757d; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-weight: 500;" title="Ocultar">
                                                     <i class="bi bi-eye-slash"></i>
                                                 </button>
                                             <?php else: ?>
                                                 <button type="submit" 
-                                                    style="background-color: #198754; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-weight: 500;" title="Activar">
+                                                    style="background-color: #D4AF37; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-weight: 500;" title="Activar">
                                                     <i class="bi bi-eye"></i>
                                                 </button>
                                             <?php endif; ?>
                                         </form>
                                         
-                                        <form action="../../controllers/Admin/ProductoController.php?accion=eliminar" method="POST" class="d-inline" onsubmit="return confirm('¿Seguro que deseas eliminar completamente este producto? ¡Esta acción no se puede deshacer!');" style="margin: 0;">
+                                        <form action="../../controllers/Admin/ProductoController.php?accion=eliminar" method="POST" class="d-inline" onsubmit="confirmarEliminacion(event, this)" style="margin: 0;">
                                             <input type="hidden" name="id_producto" value="<?php echo $p['id_producto']; ?>">
                                             <button type="submit" 
                                                 style="background-color: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-weight: 500;" title="Eliminar">
@@ -341,6 +340,47 @@ try {
             });
             filterOptions();
         });
+
+        // Alertas de confirmación SweetAlert2
+        function confirmarDesactivacion(event, form) {
+            event.preventDefault();
+            Swal.fire({
+                title: '¿Desactivar producto?',
+                text: '¿Seguro que deseas desactivar este producto?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#D4AF37',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, desactivar',
+                cancelButtonText: 'Cancelar',
+                background: '#111',
+                color: '#fff'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
+
+        function confirmarEliminacion(event, form) {
+            event.preventDefault();
+            Swal.fire({
+                title: '¿Eliminar producto?',
+                text: '¿Seguro que deseas eliminar completamente este producto? ¡Esta acción no se puede deshacer!',
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                background: '#111',
+                color: '#fff'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
     </script>
 
     <!-- Modal Agregar Producto -->
@@ -516,5 +556,195 @@ try {
         checkboxMostrarTodasModal.addEventListener('change', filtrarMarcasModal);
     </script>
 
+    <!-- Modal Editar Producto -->
+    <div id="modalEditarProducto" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+        <div style="background: white; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; border-radius: 12px; padding: 30px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+            <button type="button" onclick="cerrarModalEditarProducto()" style="position: absolute; top: 20px; right: 20px; background: transparent; border: none; font-size: 1.5rem; cursor: pointer; color: #666;"><i class="bi bi-x-lg"></i></button>
+            <h2 style="font-family: 'Montserrat', sans-serif; font-weight: 800; margin-bottom: 20px; font-size: 1.5rem;">EDITAR PRODUCTO</h2>
+            
+            <form action="../../controllers/Admin/ProductoController.php?accion=editar" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="id_producto" id="edit_id_producto">
+                
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem;">Nombre del Producto *</label>
+                    <input type="text" name="nombre" id="edit_nombre" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Montserrat', sans-serif; box-sizing: border-box;" required>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem;">Referencia / SKU *</label>
+                    <input type="text" name="referencia" id="edit_referencia" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Montserrat', sans-serif; box-sizing: border-box;" required>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem;">Categoría *</label>
+                        <select name="id_categoria" id="edit_id_categoria" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Montserrat', sans-serif; box-sizing: border-box;" required>
+                            <option value="">Seleccione una categoría</option>
+                            <?php foreach ($categorias_lista as $cat): ?>
+                                <option value="<?php echo $cat['id_categoria']; ?>"><?php echo htmlspecialchars($cat['nombre']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem;">Subcategoría</label>
+                        <select name="id_subcategoria" id="edit_id_subcategoria" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Montserrat', sans-serif; box-sizing: border-box;">
+                            <option value="">Seleccione primero una categoría</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                            <label style="font-weight: 600; margin: 0; font-size: 0.9rem;">Marca *</label>
+                            <label style="font-size: 0.8rem; cursor: pointer; color: #666; font-weight: normal; margin: 0;">
+                                <input type="checkbox" id="edit_mostrar_todas_marcas"> Mostrar todas
+                            </label>
+                        </div>
+                        <select name="id_marca" id="edit_id_marca" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Montserrat', sans-serif; box-sizing: border-box;" required>
+                            <option value="">Seleccione una marca</option>
+                            <?php foreach ($marcas_lista as $marca): ?>
+                                <option value="<?php echo $marca['id_marca']; ?>"><?php echo htmlspecialchars($marca['nombre']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem;">Género *</label>
+                        <select name="genero" id="edit_genero" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Montserrat', sans-serif; box-sizing: border-box;" required>
+                            <option value="Unisex">Unisex (Ambos)</option>
+                            <option value="Hombre">Hombre</option>
+                            <option value="Mujer">Mujer</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem;">Precio (COP) *</label>
+                        <input type="number" name="precio" id="edit_precio" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Montserrat', sans-serif; outline: none; box-sizing: border-box;" min="0" required>
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem;">Stock *</label>
+                        <input type="number" name="stock" id="edit_stock" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Montserrat', sans-serif; outline: none; box-sizing: border-box;" min="0" required>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem;">Descripción</label>
+                    <textarea name="descripcion" id="edit_descripcion" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; min-height: 80px; font-family: 'Montserrat', sans-serif; box-sizing: border-box;"></textarea>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem;">Imagen Principal (Dejar vacío para no cambiar)</label>
+                    <input type="file" name="imagen_principal" accept="image/png, image/jpeg, image/webp" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: #f9f9f9; box-sizing: border-box;">
+                </div>
+
+                <button type="submit" style="width: 100%; padding: 15px; background-color: #D4AF37; color: #1a1a1a; font-weight: 800; border: none; border-radius: 6px; cursor: pointer; font-size: 1.1rem; font-family: 'Montserrat', sans-serif; transition: 0.3s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+                    <i class="bi bi-save"></i> ACTUALIZAR PRODUCTO
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function cerrarModalEditarProducto() {
+            document.getElementById('modalEditarProducto').style.display = 'none';
+        }
+
+        function abrirModalEditarProducto(p) {
+            document.getElementById('edit_id_producto').value = p.id_producto;
+            document.getElementById('edit_nombre').value = p.nombre || '';
+            document.getElementById('edit_referencia').value = p.referencia || '';
+            document.getElementById('edit_genero').value = p.genero || 'Unisex';
+            document.getElementById('edit_precio').value = p.precio || 0;
+            document.getElementById('edit_stock').value = p.stock || 0;
+            document.getElementById('edit_descripcion').value = p.descripcion || '';
+            
+            document.getElementById('edit_id_categoria').value = p.id_categoria || '';
+            
+            cargarSubcategoriasYMarcasEditar(p.id_categoria, p.id_subcategoria, p.id_marca);
+            
+            document.getElementById('modalEditarProducto').style.display = 'flex';
+        }
+
+        function cargarSubcategoriasYMarcasEditar(idCategoria, selectedSub, selectedMarca) {
+            const subcategoriaSelect = document.getElementById('edit_id_subcategoria');
+            subcategoriaSelect.innerHTML = '<option value="">Cargando subcategorías...</option>';
+            subcategoriaSelect.disabled = true;
+
+            if (idCategoria) {
+                fetch(`../../controllers/Admin/SubcategoriaController.php?accion=obtenerPorCategoria&id_categoria=${idCategoria}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        subcategoriaSelect.disabled = false;
+                        subcategoriaSelect.innerHTML = '<option value="">Seleccione una subcategoría (Opcional)</option>';
+                        
+                        if (data.length > 0) {
+                            data.forEach(sub => {
+                                const option = document.createElement('option');
+                                option.value = sub.id_subcategoria;
+                                option.textContent = sub.nombre;
+                                if(sub.id_subcategoria == selectedSub) option.selected = true;
+                                subcategoriaSelect.appendChild(option);
+                            });
+                        } else {
+                            subcategoriaSelect.innerHTML = '<option value="">Sin subcategorías</option>';
+                            subcategoriaSelect.disabled = true;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        subcategoriaSelect.innerHTML = '<option value="">Error al cargar</option>';
+                    });
+            } else {
+                subcategoriaSelect.innerHTML = '<option value="">Seleccione primero una categoría</option>';
+                subcategoriaSelect.disabled = true;
+            }
+            
+            filtrarMarcasEditar();
+            if(selectedMarca) {
+                setTimeout(() => { document.getElementById('edit_id_marca').value = selectedMarca; }, 100);
+            }
+        }
+
+        const marcaSelectEditar = document.getElementById('edit_id_marca');
+        const allMarcaOptionsEditar = Array.from(marcaSelectEditar.querySelectorAll('option[value]:not([value=""])'));
+        const checkboxMostrarTodasEditar = document.getElementById('edit_mostrar_todas_marcas');
+
+        function filtrarMarcasEditar() {
+            const idCategoria = document.getElementById('edit_id_categoria').value;
+            const mostrarTodas = checkboxMostrarTodasEditar.checked;
+
+            allMarcaOptionsEditar.forEach(opt => {
+                if (mostrarTodas || !idCategoria) {
+                    opt.style.display = '';
+                    opt.hidden = false;
+                    opt.disabled = false;
+                } else {
+                    const marcaId = opt.value;
+                    const hasCategory = marcasCategoriasModal.some(mc => mc.id_marca == marcaId && mc.id_categoria == idCategoria);
+                    if (hasCategory) {
+                        opt.style.display = '';
+                        opt.hidden = false;
+                        opt.disabled = false;
+                    } else {
+                        opt.style.display = 'none';
+                        opt.hidden = true;
+                        opt.disabled = true;
+                    }
+                }
+            });
+
+            if (marcaSelectEditar.options[marcaSelectEditar.selectedIndex] && marcaSelectEditar.options[marcaSelectEditar.selectedIndex].disabled) {
+                marcaSelectEditar.value = '';
+            }
+        }
+
+        document.getElementById('edit_id_categoria').addEventListener('change', function() {
+            cargarSubcategoriasYMarcasEditar(this.value, null, null);
+        });
+        checkboxMostrarTodasEditar.addEventListener('change', filtrarMarcasEditar);
+
+    </script>
 </body>
 </html>

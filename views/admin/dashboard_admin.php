@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 
 if (!isset($_SESSION['id_usuario']) || $_SESSION['usuario']['id_rol'] != '1') {
@@ -42,11 +42,10 @@ $productos_recientes = [];
 try {
     // Intentar traer los productos con su categoría, subcategoría e imagen principal
     $stmt = $conn->query("
-        SELECT p.id_producto, p.nombre, p.precio, p.activo, p.genero, c.nombre as categoria, s.nombre as subcategoria, i.url_imagen 
+        SELECT p.id_producto, p.nombre, p.precio, p.activo, p.genero, c.nombre as categoria, s.nombre as subcategoria, p.img 
         FROM productos p 
         LEFT JOIN categorias c ON p.id_categoria = c.id_categoria 
         LEFT JOIN subcategoria s ON p.id_subcategoria = s.id_subcategoria
-        LEFT JOIN imagen_producto i ON p.id_producto = i.id_producto AND i.principal = 1
         ORDER BY p.id_producto DESC LIMIT 4
     ");
     $productos_recientes = $stmt->fetchAll();
@@ -64,13 +63,12 @@ try {
 $productos_mas_vendidos = [];
 try {
     $stmt = $conn->query("
-        SELECT p.id_producto, p.nombre, p.precio, p.activo, p.genero, c.nombre as categoria, s.nombre as subcategoria, i.url_imagen, SUM(dp.cantidad) as total_vendido
+        SELECT p.id_producto, p.nombre, p.precio, p.activo, p.genero, c.nombre as categoria, s.nombre as subcategoria, p.img, SUM(dp.cantidad) as total_vendido
         FROM productos p
         JOIN detalle_pedidos dp ON p.id_producto = dp.id_producto
         LEFT JOIN categorias c ON p.id_categoria = c.id_categoria
         LEFT JOIN subcategoria s ON p.id_subcategoria = s.id_subcategoria
-        LEFT JOIN imagen_producto i ON p.id_producto = i.id_producto AND i.principal = 1
-        GROUP BY p.id_producto, p.nombre, p.precio, p.activo, p.genero, c.nombre, s.nombre, i.url_imagen
+        GROUP BY p.id_producto, p.nombre, p.precio, p.activo, p.genero, c.nombre, s.nombre, p.img
         ORDER BY total_vendido DESC
         LIMIT 4
     ");
@@ -182,8 +180,8 @@ try {
                             <?php foreach ($productos_recientes as $p): ?>
                             <tr>
                                 <td>
-                                    <?php if (!empty($p['url_imagen'])): ?>
-                                        <img src="../../<?php echo htmlspecialchars($p['url_imagen']); ?>" class="table-img">
+                                    <?php if (!empty($p['img'])): ?>
+                                        <img src="../../<?php echo htmlspecialchars($p['img']); ?>" class="table-img">
                                     <?php else: ?>
                                         <div class="table-img d-flex align-items-center justify-content-center bg-light">
                                             <i class="bi bi-image text-muted"></i>
@@ -246,8 +244,8 @@ try {
                             <?php foreach ($productos_mas_vendidos as $p): ?>
                             <tr>
                                 <td>
-                                    <?php if (!empty($p['url_imagen'])): ?>
-                                        <img src="../../<?php echo htmlspecialchars($p['url_imagen']); ?>" class="table-img">
+                                    <?php if (!empty($p['img'])): ?>
+                                        <img src="../../<?php echo htmlspecialchars($p['img']); ?>" class="table-img">
                                     <?php else: ?>
                                         <div class="table-img d-flex align-items-center justify-content-center bg-light">
                                             <i class="bi bi-image text-muted"></i>

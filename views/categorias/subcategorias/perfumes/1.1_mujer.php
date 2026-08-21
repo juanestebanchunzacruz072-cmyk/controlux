@@ -1,16 +1,15 @@
-<?php 
+﻿<?php 
 require '../../../../config/database.php';
 include '../../../layouts/header.php'; 
 
 // Fetch Mujer & Unisex 1.1 Perfumes
 try {
     $stmt = $conn->query("
-        SELECT p.id_producto, p.nombre, p.precio, p.genero, p.stock, p.descripcion, m.nombre as marca, i.url_imagen 
+        SELECT p.id_producto, p.nombre, p.precio, p.genero, p.stock, p.descripcion, m.nombre as marca, p.img 
         FROM productos p
         INNER JOIN categorias c ON p.id_categoria = c.id_categoria
         INNER JOIN subcategoria s ON p.id_subcategoria = s.id_subcategoria
         LEFT JOIN marcas m ON p.id_marca = m.id_marca
-        LEFT JOIN imagen_producto i ON p.id_producto = i.id_producto AND i.principal = 1
         WHERE c.nombre = 'Perfumes' 
           AND s.nombre = '1.1' 
           AND (p.genero = 'Mujer' OR p.genero = 'Unisex')
@@ -45,7 +44,7 @@ try {
                             <?php if($p['genero'] == 'Unisex'): ?>
                                 <span class="badge bg-secondary position-absolute top-0 start-0 m-2">Unisex</span>
                             <?php endif; ?>
-                            <img src="/controlux/<?php echo htmlspecialchars(ltrim($p['url_imagen'] ?? 'img/perfume.webp', '/')); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($p['nombre']); ?>" style="height: 200px; object-fit: contain;">
+                            <img src="/controlux/<?php echo htmlspecialchars(ltrim($p['img'] ?? 'img/perfume.webp', '/')); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($p['nombre']); ?>" style="height: 200px; object-fit: contain;">
                         </div>
                         <div class="card-body text-center d-flex flex-column">
                             <span class="text-uppercase mb-1" style="font-size: 0.8rem; letter-spacing: 1px; color: #888; font-weight: 600;"><?php echo htmlspecialchars($p['marca'] ?? 'Marca'); ?></span>
@@ -58,7 +57,7 @@ try {
                                     data-name="<?php echo htmlspecialchars($p['nombre']); ?>" 
                                     data-price="<?php echo $p['precio']; ?>" 
                                     data-stock="<?php echo $p['stock']; ?>" 
-                                    data-img="/controlux/<?php echo htmlspecialchars(ltrim($p['url_imagen'] ?? 'img/perfume.webp', '/')); ?>"
+                                    data-img="/controlux/<?php echo htmlspecialchars(ltrim($p['img'] ?? 'img/perfume.webp', '/')); ?>"
                                     style="font-weight: 600; font-size: 0.95rem;">
                                     <i class="bi bi-cart-plus me-1"></i> Añadir al carrito
                                 </button>

@@ -1,4 +1,4 @@
-<!-- Cart Offcanvas -->
+﻿<!-- Cart Offcanvas -->
 <div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel">
     <div class="offcanvas-header d-flex justify-content-between align-items-center">
         <h6 class="offcanvas-title mb-0" id="cartOffcanvasLabel" style="font-weight: 800; letter-spacing: 1px;">
@@ -28,14 +28,14 @@
             <div class="d-flex overflow-auto pb-2 recommendations-scroll" style="-webkit-overflow-scrolling: touch;">
                 <?php foreach($recomendaciones as $rec): ?>
                 <div class="recommendation-card">
-                    <img src="/controlux/<?php echo htmlspecialchars(ltrim($rec['url_imagen'] ?? 'img/accesorio.png', '/')); ?>" alt="<?php echo htmlspecialchars($rec['nombre']); ?>" class="recommendation-img">
+                    <img src="/controlux/<?php echo htmlspecialchars(ltrim($rec['img'] ?? 'img/accesorio.png', '/')); ?>" alt="<?php echo htmlspecialchars($rec['nombre']); ?>" class="recommendation-img">
                     <div class="recommendation-name"><?php echo htmlspecialchars($rec['nombre']); ?></div>
                     <button class="btn-add-recommendation add-to-cart-btn" 
                             data-id="<?php echo $rec['id_producto']; ?>" 
                             data-name="<?php echo htmlspecialchars($rec['nombre']); ?>" 
                             data-price="<?php echo $rec['precio']; ?>" 
                             data-stock="<?php echo $rec['stock']; ?>" 
-                            data-img="/controlux/<?php echo htmlspecialchars(ltrim($rec['url_imagen'] ?? 'img/accesorio.png', '/')); ?>">
+                            data-img="/controlux/<?php echo htmlspecialchars(ltrim($rec['img'] ?? 'img/accesorio.png', '/')); ?>">
                         Añadir
                     </button>
                 </div>
