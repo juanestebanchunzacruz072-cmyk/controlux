@@ -1,0 +1,219 @@
+/* style_carrito.css */
+:root {
+    --gold: #D4AF37;
+    --black: #0a0a0a;
+    --white: #ffffff;
+    --light-gray: #f8f9fa;
+    --border-color: #eaeaea;
+    --text-gray: #888888;
+}
+
+#cartOffcanvas {
+    width: 400px;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+    background-color: var(--white);
+    color: var(--black);
+    
+}
+
+#cartOffcanvas .offcanvas-header {
+    background-color: var(--black);
+    color: var(--gold);
+    border-bottom: none;
+    padding: 1.3rem 1.8rem;
+}
+
+#cartOffcanvas .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+    opacity: 0.8;
+}
+
+#cartOffcanvas .btn-close:hover {
+    opacity: 1;
+}
+
+.cart-item {
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.cart-item:last-child {
+    border-bottom: none;
+}
+
+/* Ocultar scrollbar horizontal en recomendaciones */
+.recommendations-scroll::-webkit-scrollbar {
+    display: none;
+}
+.recommendations-scroll {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.cart-item-img {
+    width: 65px;
+    height: 65px;
+    object-fit: contain;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 2px;
+}
+
+.cart-item-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--black);
+    margin-bottom: 0.2rem;
+}
+
+.cart-item-subtitle {
+    font-size: 0.75rem;
+    color: var(--text-gray);
+    margin-bottom: 0.5rem;
+}
+
+.btn-remove-item {
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.btn-remove-item:hover {
+    color: #ff4d4d !important;
+    transform: scale(1.1);
+}
+
+.qty-controls {
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    display: inline-flex;
+    overflow: hidden;
+}
+
+.qty-btn {
+    background: white;
+    border: none;
+    padding: 0.1rem 0.5rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    color: var(--black);
+}
+
+.qty-btn:hover {
+    background: var(--light-gray);
+}
+
+.qty-input {
+    width: 30px;
+    border: none;
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0;
+}
+
+.item-total-price {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--black);
+}
+
+/* Recomendaciones */
+.recommendations-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+}
+
+.recommendation-card {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.5rem;
+    text-align: center;
+    width: 110px;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.recommendation-img {
+    width: 100%;
+    height: 60px;
+    object-fit: contain;
+    margin-bottom: 0.5rem;
+}
+
+.recommendation-name {
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-add-recommendation {
+    font-size: 0.65rem;
+    border: 1px solid var(--black);
+    background: transparent;
+    border-radius: 4px;
+    padding: 0.2rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.btn-add-recommendation:hover {
+    background: var(--black);
+    color: var(--white);
+}
+
+/* Footer del carrito */
+.cart-footer-summary {
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+}
+
+.cart-total-label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--black);
+}
+
+.cart-total-amount {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--black);
+}
+
+.btn-checkout-cart {
+    background-color: var(--black);
+    color: var(--gold);
+    font-weight: bold;
+    border: none;
+    border-radius: 0;
+    padding: 0.8rem;
+    font-size: 1rem;
+    transition: opacity 0.3s ease;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.btn-checkout-cart:hover {
+    opacity: 0.9;
+    color: var(--gold);
+}
+
+/* Scrollbar */
+#cart-items::-webkit-scrollbar, .overflow-auto::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+#cart-items::-webkit-scrollbar-track, .overflow-auto::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+#cart-items::-webkit-scrollbar-thumb, .overflow-auto::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 5px;
+}

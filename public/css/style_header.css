@@ -1,0 +1,108 @@
+:root {
+    --gold-premium: #D4AF37;
+    --black-absolute: #000000;
+    --dark-grey: #121212;
+    --white-pure: #FFFFFF;
+}
+
+body {
+    background-color: var(--white-pure);
+    color: var(--dark-grey);
+    font-family: 'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* Navbar Styles */
+.navbar {
+    background-color: var(--black-absolute);
+}
+.navbar-brand {
+    color: var(--gold-premium) !important;
+    font-weight: bold;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+}
+.nav-link {
+    color: var(--white-pure) !important;
+    transition: color 0.3s ease;
+}
+.nav-link:hover, .nav-link:focus, .nav-link.active {
+    color: var(--gold-premium) !important;
+}
+.dropdown-menu {
+    background-color: var(--dark-grey);
+    border: 1px solid var(--gold-premium);
+}
+.dropdown-item {
+    color: var(--white-pure);
+}
+.dropdown-item:hover, .dropdown-item:focus, .dropdown-item.active, .dropdown-item:active {
+    background-color: var(--gold-premium) !important;
+    color: var(--black-absolute) !important;
+}
+
+/* Cart Badge */
+.cart-icon {
+    position: relative;
+    color: var(--white-pure);
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+}
+.cart-icon:hover {
+    color: var(--gold-premium);
+}
+.cart-badge {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: var(--gold-premium);
+    color: var(--black-absolute);
+    font-size: 0.75rem;
+    font-weight: bold;
+    border-radius: 50%;
+    padding: 0.2rem 0.4rem;
+}
+
+/* Buttons */
+.btn-gold {
+    background-color: var(--gold-premium);
+    color: var(--black-absolute);
+    font-weight: bold;
+    border: none;
+    transition: all 0.3s ease;
+}
+.btn-gold:hover {
+    background-color: #b5952f;
+    color: var(--white-pure);
+}
+.btn-outline-gold {
+    background-color: transparent;
+    color: var(--gold-premium);
+    border: 2px solid var(--gold-premium);
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+.btn-outline-gold:hover {
+    background-color: var(--gold-premium);
+    color: var(--black-absolute);
+}
+
+/* Cards */
+.product-card {
+    border: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+.product-card:hover {
+    transform: translateY(-5px);
+}
+.card-title {
+    font-weight: bold;
+    color: var(--black-absolute);
+}
+.card-price {
+    color: var(--gold-premium);
+    font-weight: bold;
+    font-size: 1.2rem;
+}
