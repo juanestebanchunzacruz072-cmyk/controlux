@@ -133,6 +133,7 @@ $total_paginas = ceil($resultado['total'] / $items_por_pagina);
         </div>
 
         <!-- Tabla de Marcas -->
+        <h3 style="font-family: 'Montserrat', sans-serif; font-weight: 630; color: #6c757d; margin-top: 1.5rem; margin-bottom: 0.5rem; text-transform: uppercase;">Lista de Marcas</h3>
         <section class="table-container-section mt-4 mb-4">
             <div class="table-container">
                 <table class="table">

@@ -58,9 +58,8 @@ $detalles = $stmt_detalles->fetchAll(PDO::FETCH_ASSOC);
 <div class="container">
     <div class="invoice-container">
         <!-- Botones de Acción -->
-        <div class="d-flex justify-content-between mb-4 no-print">
+        <div class="d-flex justify-content-between mb-4 no-print" data-html2canvas-ignore>
             <a href="../../public/index.php" class="btn btn-outline-dark"><i class="bi bi-arrow-left"></i> Volver a la Tienda</a>
-            <button onclick="window.print()" class="btn-print"><i class="bi bi-printer me-2"></i> Imprimir Factura</button>
         </div>
 
         <div class="invoice-header d-flex justify-content-between align-items-end">
@@ -132,5 +131,21 @@ $detalles = $stmt_detalles->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const element = document.querySelector('.invoice-container');
+        const opt = {
+            margin:       10,
+            filename:     'Factura_JCURBAN_#<?php echo str_pad($id_pedido, 5, '0', STR_PAD_LEFT); ?>.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        
+        // Generar y descargar el PDF automáticamente
+        html2pdf().set(opt).from(element).save();
+    });
+</script>
 </body>
 </html>
