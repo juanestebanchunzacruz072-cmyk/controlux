@@ -22,7 +22,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <!-- Custom Cart CSS -->
     <link href="/controlux/public/css/style_carrito.css?v=<?php echo time(); ?>" rel="stylesheet">
 </head>
-<body>
+<body class="<?php echo (isset($_SESSION['usuario']['id_rol']) && $_SESSION['usuario']['id_rol'] == '1') ? 'admin-mode' : ''; ?>">
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark sticky-top bg-black" style="background-color: var(--black) !important;">
@@ -63,10 +63,19 @@ if (session_status() === PHP_SESSION_NONE) {
                 </li>
             </ul>
             <div class="d-flex align-items-center">
-                <a href="#" class="cart-icon text-decoration-none me-3" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas" aria-controls="cartOffcanvas" style="position: relative;">
-                    <i class="bi bi-cart3" style="font-size: 1.5rem; color: var(--gold, #D4AF37);"></i>
-                    <span id="cart-badge-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background-color: var(--gold, #D4AF37); color: var(--black, #0a0a0a);">0</span>
-                </a>
+                <?php 
+                $isAdmin = isset($_SESSION['usuario']['id_rol']) && $_SESSION['usuario']['id_rol'] == '1';
+                ?>
+                
+                <?php if ($isAdmin): ?>
+                    <!-- Ocultar carrito para administrador (manejado por CSS .admin-mode) -->
+                <?php else: ?>
+                    <a href="#" class="cart-icon text-decoration-none me-3" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas" aria-controls="cartOffcanvas" style="position: relative;">
+                        <i class="bi bi-cart3" style="font-size: 1.5rem; color: var(--gold, #D4AF37);"></i>
+                        <span id="cart-badge-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background-color: var(--gold, #D4AF37); color: var(--black, #0a0a0a);">0</span>
+                    </a>
+                <?php endif; ?>
+
                 <?php if (isset($_SESSION['id_usuario'])): ?>
                     <div class="nav-item dropdown ms-2">
                         <a class="nav-link dropdown-toggle text-white d-flex align-items-center px-2 py-1 rounded" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="border: 1px solid var(--gold, #D4AF37);">
@@ -74,10 +83,14 @@ if (session_status() === PHP_SESSION_NONE) {
                             <?php echo htmlspecialchars($_SESSION['usuario']['usuario'] ?? 'Mi Perfil'); ?>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" href="/controlux/views/cliente/perfil.php"><i class="bi bi-person-lines-fill me-2"></i>Información del usuario</a></li>
-                            <?php if (isset($_SESSION['usuario']['id_rol']) && $_SESSION['usuario']['id_rol'] == '1'): ?>
+                            <?php if (!$isAdmin): ?>
+                                <li><a class="dropdown-item" href="/controlux/views/cliente/perfil.php"><i class="bi bi-person-lines-fill me-2"></i>Información del usuario</a></li>
+                            <?php endif; ?>
+                            
+                            <?php if ($isAdmin): ?>
                                 <li><a class="dropdown-item" href="/controlux/views/admin/dashboard_admin.php"><i class="bi bi-speedometer2 me-2"></i>Panel de Administración</a></li>
                             <?php endif; ?>
+                            
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-danger" href="/controlux/controllers/Auth/logout.php"><i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión</a></li>
                         </ul>

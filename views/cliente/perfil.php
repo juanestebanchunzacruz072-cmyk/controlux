@@ -1,7 +1,12 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['id_usuario'])) {
     header("Location: /controlux/views/auth/login.php");
+    exit;
+}
+
+if (isset($_SESSION['usuario']['id_rol']) && $_SESSION['usuario']['id_rol'] == '1') {
+    header("Location: /controlux/public/index.php");
     exit;
 }
 
@@ -18,20 +23,36 @@ try {
     die("Error al obtener la información del usuario.");
 }
 
-// Obtener pedidos del usuario
+// Paginación para pedidos
+$items_por_pagina = 3; // Mostrar 3 pedidos por página para que no baje mucho
+$pagina_actual = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($pagina_actual < 1) $pagina_actual = 1;
+$offset = ($pagina_actual - 1) * $items_por_pagina;
+
 $pedidos = [];
+$total_pedidos = 0;
+$total_paginas = 1;
+
 try {
+    // 1. Obtener el total de pedidos para calcular las páginas
+    $stmt_count = $conn->prepare("SELECT COUNT(*) FROM pedidos WHERE id_usuario = ?");
+    $stmt_count->execute([$id_usuario]);
+    $total_pedidos = $stmt_count->fetchColumn();
+    $total_paginas = ceil($total_pedidos / $items_por_pagina);
+
+    // 2. Obtener los pedidos con límite
     $stmt = $conn->prepare("
         SELECT p.id_pedido, p.fecha_pedido, p.total, e.nombre as estado 
         FROM pedidos p 
         LEFT JOIN estado_pedidos e ON p.id_estado = e.id_estado 
         WHERE p.id_usuario = ? 
         ORDER BY p.id_pedido DESC
+        LIMIT $items_por_pagina OFFSET $offset
     ");
     $stmt->execute([$id_usuario]);
     $pedidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Obtener artículos para cada pedido
+    // 3. Obtener artículos para cada pedido
     foreach ($pedidos as &$pedido) {
         $stmt_items = $conn->prepare("
             SELECT dp.cantidad, pr.nombre 
@@ -43,7 +64,7 @@ try {
         $pedido['items'] = $stmt_items->fetchAll(PDO::FETCH_ASSOC);
     }
 } catch (PDOException $e) {
-    // Si la tabla no existe o hay error, pedidos quedará vacío
+    // Error silencioso si no hay tablas
 }
 
 include '../layouts/header.php';
@@ -163,51 +184,97 @@ include '../layouts/header.php';
                             <a href="/controlux/public/index.php" class="btn btn-outline-dark fw-bold mt-2" style="border-color: var(--gold, #D4AF37);">Explorar Catálogo</a>
                         </div>
                     <?php else: ?>
-                        <div class="table-responsive">
-                            <table class="table align-middle">
-                                <thead>
-                                    <tr>
-                                        <th style="color: #555;">ID Pedido</th>
-                                        <th style="color: #555;">Fecha</th>
-                                        <th style="color: #555;">Total</th>
-                                        <th style="color: #555;">Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($pedidos as $pedido): ?>
-                                        <tr>
-                                            <td class="fw-bold">#<?php echo htmlspecialchars($pedido['id_pedido']); ?></td>
-                                            <td><?php echo date('d/m/Y', strtotime($pedido['fecha_pedido'])); ?></td>
-                                            <td class="fw-bold" style="color: var(--gold, #D4AF37);">$<?php echo number_format($pedido['total'], 0, ',', '.'); ?></td>
-                                            <td>
-                                                <?php 
-                                                    $estado = $pedido['estado'] ?? 'Recibido';
-                                                    $badgeClass = 'bg-secondary';
-                                                    if (strtolower($estado) == 'entregado') $badgeClass = 'bg-success';
-                                                    else if (strtolower($estado) == 'enviado') $badgeClass = 'bg-primary';
-                                                    else if (strtolower($estado) == 'empacado') $badgeClass = 'bg-info text-dark';
-                                                ?>
-                                                <span class="badge <?php echo $badgeClass; ?>"><?php echo htmlspecialchars($estado); ?></span>
-                                            </td>
-                                        </tr>
+                        <link href="/controlux/public/css/style_perfil.css?v=<?php echo time(); ?>" rel="stylesheet">
+
+                        <?php foreach ($pedidos as $pedido): ?>
+                            <div class="order-card">
+                                <div class="order-header">
+                                    <div>
+                                        <h5 class="mb-1" style="font-weight: 800;">Pedido #<?php echo str_pad($pedido['id_pedido'], 6, '0', STR_PAD_LEFT); ?></h5>
+                                        <small class="text-muted"><i class="bi bi-calendar3"></i> <?php echo date('d/m/Y H:i', strtotime($pedido['fecha_pedido'])); ?></small>
+                                    </div>
+                                    <h4 class="mb-0" style="color: var(--gold, #D4AF37); font-weight: 800;">$<?php echo number_format($pedido['total'], 0, ',', '.'); ?></h4>
+                                </div>
+
+                                <?php 
+                                    $estado = strtolower($pedido['estado'] ?? 'pendiente');
+                                    
+                                    // Mapear estado a paso actual (1 a 4)
+                                    $paso_actual = 1;
+                                    if (strpos($estado, 'pagado') !== false) $paso_actual = 2;
+                                    else if (strpos($estado, 'enviado') !== false) $paso_actual = 3;
+                                    else if (strpos($estado, 'entregado') !== false) $paso_actual = 4;
+                                ?>
+
+                                <!-- Stepper Visual -->
+                                <div class="stepper-wrapper">
+                                    <div class="stepper-item <?php echo $paso_actual >= 1 ? ($paso_actual == 1 ? 'active' : 'completed') : ''; ?>">
+                                        <div class="step-counter"><i class="bi <?php echo $paso_actual > 1 ? 'bi-check-lg' : 'bi-clipboard-check'; ?>"></i></div>
+                                        <div class="step-name">Confirmado</div>
+                                    </div>
+                                    <div class="stepper-item <?php echo $paso_actual >= 2 ? ($paso_actual == 2 ? 'active' : 'completed') : ''; ?>">
+                                        <div class="step-counter"><i class="bi <?php echo $paso_actual > 2 ? 'bi-check-lg' : 'bi-credit-card'; ?>"></i></div>
+                                        <div class="step-name">Pagado</div>
+                                    </div>
+                                    <div class="stepper-item <?php echo $paso_actual >= 3 ? ($paso_actual == 3 ? 'active' : 'completed') : ''; ?>">
+                                        <div class="step-counter"><i class="bi <?php echo $paso_actual > 3 ? 'bi-check-lg' : 'bi-truck'; ?>"></i></div>
+                                        <div class="step-name">En Camino</div>
+                                    </div>
+                                    <div class="stepper-item <?php echo $paso_actual >= 4 ? 'completed active' : ''; ?>">
+                                        <div class="step-counter"><i class="bi <?php echo $paso_actual == 4 ? 'bi-check-lg' : 'bi-house-door'; ?>"></i></div>
+                                        <div class="step-name">Entregado</div>
+                                    </div>
+                                    <!-- Progress bar overlay for the line -->
+                                    <div style="position: absolute; top: 15px; left: 0; height: 3px; background-color: var(--gold, #D4AF37); z-index: 1; transition: width 0.3s ease; width: <?php echo ($paso_actual - 1) * 33.33; ?>%;"></div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <strong style="color: #444;">Dirección de Entrega:</strong><br>
+                                    <span style="color: #666;"><i class="bi bi-geo-alt" style="color: var(--gold, #D4AF37);"></i> <?php echo htmlspecialchars($usuario['direccion'] ?? 'Pendiente'); ?>, <?php echo htmlspecialchars($usuario['barrio'] ?? ''); ?>, <?php echo htmlspecialchars($usuario['ciudad'] ?? ''); ?></span>
+                                </div>
+
+                                <div class="order-details-box">
+                                    <h6 class="fw-bold mb-3" style="color: #333;">Detalle del pedido</h6>
+                                    <ul style="list-style: none; padding: 0; margin: 0;">
                                         <?php if (!empty($pedido['items'])): ?>
-                                        <tr>
-                                            <td colspan="4" style="background-color: #f8f9fa; border-top: none; padding: 10px 15px;">
-                                                <div style="font-size: 0.85rem; color: #666;">
-                                                    <strong>Artículos:</strong>
-                                                    <ul class="mb-0 mt-1" style="list-style-type: none; padding-left: 0;">
-                                                        <?php foreach ($pedido['items'] as $item): ?>
-                                                            <li><i class="bi bi-arrow-right-short" style="color: var(--gold, #D4AF37);"></i> <?php echo htmlspecialchars($item['cantidad']); ?>x <?php echo htmlspecialchars($item['nombre']); ?></li>
-                                                        <?php endforeach; ?>
-                                                    </ul>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                            <?php foreach ($pedido['items'] as $item): ?>
+                                                <li style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 8px 0;">
+                                                    <span style="color: #555;"><i class="bi bi-dot" style="color: var(--gold, #D4AF37);"></i> <?php echo htmlspecialchars($item['nombre']); ?></span>
+                                                    <span class="fw-bold text-muted">x<?php echo htmlspecialchars($item['cantidad']); ?></span>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <li class="text-muted">No hay artículos registrados para este pedido.</li>
                                         <?php endif; ?>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
+                                    </ul>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+
+                        <!-- Paginación -->
+                        <?php if ($total_paginas > 1): ?>
+                            <nav aria-label="Navegación de pedidos" class="mt-4">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item <?php echo $pagina_actual <= 1 ? 'disabled' : ''; ?>">
+                                        <a class="page-link" href="?page=<?php echo $pagina_actual - 1; ?>" style="color: var(--gold, #D4AF37);">&laquo; Anterior</a>
+                                    </li>
+                                    
+                                    <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
+                                        <li class="page-item <?php echo $pagina_actual == $i ? 'active' : ''; ?>">
+                                            <a class="page-link" href="?page=<?php echo $i; ?>" 
+                                               style="<?php echo $pagina_actual == $i ? 'background-color: var(--gold, #D4AF37); border-color: var(--gold, #D4AF37); color: #fff;' : 'color: #333;'; ?>">
+                                                <?php echo $i; ?>
+                                            </a>
+                                        </li>
+                                    <?php endfor; ?>
+                                    
+                                    <li class="page-item <?php echo $pagina_actual >= $total_paginas ? 'disabled' : ''; ?>">
+                                        <a class="page-link" href="?page=<?php echo $pagina_actual + 1; ?>" style="color: var(--gold, #D4AF37);">Siguiente &raquo;</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        <?php endif; ?>
+                        
                     <?php endif; ?>
                 </div>
             </div>

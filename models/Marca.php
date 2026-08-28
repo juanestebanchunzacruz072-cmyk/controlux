@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/../config/database.php';
 
 class Marca
@@ -77,6 +77,63 @@ class Marca
         } catch (PDOException $e) {
             error_log("Error obteniendo marcas: " . $e->getMessage());
             return [];
+        }
+    }
+
+    public function obtenerPaginadas($id_categoria = null, $limit = 10, $offset = 0)
+    {
+        try {
+            $params = [];
+            $where = "WHERE 1=1";
+            
+            if (!empty($id_categoria)) {
+                $where .= " AND m.id_marca IN (SELECT id_marca FROM marcas_categorias WHERE id_categoria = ?)";
+                $params[] = $id_categoria;
+            }
+
+            // Contar total
+            $stmtCount = $this->conn->prepare("SELECT COUNT(DISTINCT m.id_marca) FROM marcas m $where");
+            $stmtCount->execute($params);
+            $total = $stmtCount->fetchColumn();
+
+            // Obtener datos
+            $sql = "SELECT DISTINCT m.id_marca, m.nombre, m.descripcion, m.activo FROM marcas m $where ORDER BY m.id_marca DESC LIMIT " . (int)$limit . " OFFSET " . (int)$offset;
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute($params);
+            $marcas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Obtener relaciones
+            if (!empty($marcas)) {
+                $ids = array_column($marcas, 'id_marca');
+                $placeholders = implode(',', array_fill(0, count($ids), '?'));
+                
+                $stmtCat = $this->conn->prepare("SELECT id_marca, id_categoria FROM marcas_categorias WHERE id_marca IN ($placeholders)");
+                $stmtCat->execute($ids);
+                $relCat = $stmtCat->fetchAll(PDO::FETCH_ASSOC);
+                
+                $stmtSub = $this->conn->prepare("SELECT id_marca, id_subcategoria FROM marcas_subcategorias WHERE id_marca IN ($placeholders)");
+                $stmtSub->execute($ids);
+                $relSub = $stmtSub->fetchAll(PDO::FETCH_ASSOC);
+
+                $catMap = [];
+                foreach ($relCat as $rc) {
+                    $catMap[$rc['id_marca']][] = $rc['id_categoria'];
+                }
+                $subMap = [];
+                foreach ($relSub as $rs) {
+                    $subMap[$rs['id_marca']][] = $rs['id_subcategoria'];
+                }
+
+                foreach ($marcas as &$marca) {
+                    $marca['categorias'] = $catMap[$marca['id_marca']] ?? [];
+                    $marca['subcategorias'] = $subMap[$marca['id_marca']] ?? [];
+                }
+            }
+
+            return ['marcas' => $marcas, 'total' => $total];
+        } catch (PDOException $e) {
+            error_log("Error obteniendo marcas paginadas: " . $e->getMessage());
+            return ['marcas' => [], 'total' => 0];
         }
     }
 

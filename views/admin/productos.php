@@ -34,6 +34,15 @@ try {
     $marcas_categorias_lista = $stmt_mc->fetchAll(PDO::FETCH_ASSOC);
     $marcas_cat_lista = $conn->query("SELECT DISTINCT id_marca, id_categoria FROM productos WHERE id_marca IS NOT NULL AND id_categoria IS NOT NULL")->fetchAll(PDO::FETCH_ASSOC);
 
+    // Variables de paginación
+    $items_por_pagina = 10;
+    $pagina_actual = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    if ($pagina_actual < 1) $pagina_actual = 1;
+    $offset = ($pagina_actual - 1) * $items_por_pagina;
+
+    // Base query para contar
+    $sql_count = "SELECT COUNT(*) FROM productos p WHERE 1=1";
+    
     $sql_productos = "
         SELECT p.*, c.nombre as categoria, s.nombre as subcategoria, m.nombre as marca 
         FROM productos p 
@@ -46,18 +55,28 @@ try {
     $params = [];
     if (!empty($filtro_categoria)) {
         $sql_productos .= " AND p.id_categoria = :id_categoria";
+        $sql_count .= " AND p.id_categoria = :id_categoria";
         $params[':id_categoria'] = $filtro_categoria;
     }
     if (!empty($filtro_subcategoria)) {
         $sql_productos .= " AND p.id_subcategoria = :id_subcategoria";
+        $sql_count .= " AND p.id_subcategoria = :id_subcategoria";
         $params[':id_subcategoria'] = $filtro_subcategoria;
     }
     if (!empty($filtro_marca)) {
         $sql_productos .= " AND p.id_marca = :id_marca";
+        $sql_count .= " AND p.id_marca = :id_marca";
         $params[':id_marca'] = $filtro_marca;
     }
     
-    $sql_productos .= " ORDER BY p.id_producto DESC";
+    // Ejecutar conteo
+    $stmt_count = $conn->prepare($sql_count);
+    $stmt_count->execute($params);
+    $total_productos = $stmt_count->fetchColumn();
+    $total_paginas = ceil($total_productos / $items_por_pagina);
+
+    // Añadir orden y paginación a la consulta principal
+    $sql_productos .= " ORDER BY p.id_producto DESC LIMIT $items_por_pagina OFFSET $offset";
 
     $stmt = $conn->prepare($sql_productos);
     $stmt->execute($params);
@@ -82,6 +101,7 @@ try {
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="../../public/css/style_productos_admin.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="../../public/css/pagination.css?v=<?php echo time(); ?>">
 </head>
 <body>
 
@@ -254,6 +274,35 @@ try {
                     </tbody>
                 </table>
             </div>
+            
+            <!-- Paginación -->
+            <?php if (isset($total_paginas) && $total_paginas > 1): ?>
+                <nav aria-label="Navegación de productos">
+                    <ul class="custom-pagination">
+                        <?php 
+                            $query_string = $_GET;
+                            unset($query_string['page']);
+                            $base_url = '?' . http_build_query($query_string) . (!empty($query_string) ? '&' : '');
+                        ?>
+                        <li class="<?php echo $pagina_actual <= 1 ? 'disabled' : ''; ?>">
+                            <a class="page-link" href="<?php echo $base_url; ?>page=<?php echo $pagina_actual - 1; ?>">&laquo; Anterior</a>
+                        </li>
+                        
+                        <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
+                            <li class="<?php echo $pagina_actual == $i ? 'active' : ''; ?>">
+                                <a class="page-link" href="<?php echo $base_url; ?>page=<?php echo $i; ?>">
+                                    <?php echo $i; ?>
+                                </a>
+                            </li>
+                        <?php endfor; ?>
+                        
+                        <li class="<?php echo $pagina_actual >= $total_paginas ? 'disabled' : ''; ?>">
+                            <a class="page-link" href="<?php echo $base_url; ?>page=<?php echo $pagina_actual + 1; ?>">Siguiente &raquo;</a>
+                        </li>
+                    </ul>
+                </nav>
+            <?php endif; ?>
+            
         </section>
     </main>
 

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 
 // Si no hay carrito, volver al index
@@ -103,7 +103,7 @@ $total = $subtotal; // Asumiendo que no hay impuestos adicionales
                             <span style="color: var(--gold);">$<?php echo number_format($total, 0, ',', '.'); ?></span>
                         </div>
 
-                        <form action="../../controllers/cliente/PedidoClienteController.php?accion=guardar" method="POST" class="mt-4" target="_blank" onsubmit="setTimeout(() => { window.location.href = '../../public/index.php?pedido_exito=1'; }, 1000); localStorage.removeItem('controlux_cart');">
+                        <form action="../../controllers/cliente/PedidoClienteController.php?accion=guardar" method="POST" class="mt-4" target="_blank" onsubmit="confirmarPedido(event, this)">
                             <input type="hidden" name="total" value="<?php echo $total; ?>">
                             <button type="submit" class="btn btn-confirm">
                                 <i class="bi bi-whatsapp me-2"></i> Confirmar por WhatsApp
@@ -117,5 +117,30 @@ $total = $subtotal; // Asumiendo que no hay impuestos adicionales
             </div>
         </div>
     </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmarPedido(event, form) {
+            event.preventDefault();
+            Swal.fire({
+                title: '¿Confirmar Pedido?',
+                text: 'Una vez presiones esta opción tu pedido estará registrado en nuestro inventario. Ya solo confirmas el pago por WhatsApp.',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#D4AF37',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Continuar a WhatsApp',
+                cancelButtonText: 'Cancelar',
+                background: '#0a0a0a',
+                color: '#fff'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                    setTimeout(() => { window.location.href = '../../public/index.php?pedido_exito=1'; }, 1000);
+                    localStorage.removeItem('controlux_cart');
+                }
+            });
+        }
+    </script>
 </body>
 </html>

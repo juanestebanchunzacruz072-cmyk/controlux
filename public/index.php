@@ -67,14 +67,19 @@ include '../views/layouts/header.php';
         }
 
         if (urlParams.has('pedido_exito')) {
+            const idUltimoPedido = <?php echo json_encode($_SESSION['ultimo_pedido'] ?? null); ?>;
             Swal.fire({
                 title: '¡Pedido Realizado!',
                 text: 'Tu pedido se ha procesado correctamente y la confirmación se ha enviado a WhatsApp.',
                 icon: 'success',
                 confirmButtonColor: '#D4AF37',
-                confirmButtonText: 'Aceptar',
+                confirmButtonText: 'Ver Factura',
                 background: '#0a0a0a',
                 color: '#fff'
+            }).then((result) => {
+                if (result.isConfirmed && idUltimoPedido) {
+                    window.location.href = '../views/cliente/factura.php?id=' + idUltimoPedido;
+                }
             });
             // Limpiar la URL para que no vuelva a salir al recargar
             window.history.replaceState(null, null, window.location.pathname);

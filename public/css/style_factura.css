@@ -1,0 +1,109 @@
+:root {
+    --gold: #D4AF37;
+    --black: #0a0a0a;
+    --dark-gray: #1a1a1a;
+    --text-gray: #666666;
+    --border: #eaeaea;
+}
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f5f5f5;
+    color: var(--black);
+}
+.invoice-container {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 50px;
+    position: relative;
+}
+.invoice-header {
+    border-bottom: 2px solid var(--gold);
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+}
+.invoice-title {
+    color: var(--gold);
+    font-weight: 800;
+    font-size: 2.5rem;
+    letter-spacing: 2px;
+}
+.company-details p, .client-details p {
+    margin-bottom: 5px;
+    color: var(--text-gray);
+    font-size: 0.95rem;
+}
+.company-details h4, .client-details h4 {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--black);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+.table-invoice {
+    width: 100%;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+.table-invoice th {
+    background-color: var(--dark-gray);
+    color: var(--gold);
+    padding: 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+.table-invoice td {
+    padding: 15px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+.invoice-total-container {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid var(--gold);
+}
+.invoice-total {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--black);
+}
+.invoice-total span {
+    color: var(--gold);
+}
+.btn-print {
+    background-color: var(--gold);
+    color: var(--black);
+    font-weight: 700;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 4px;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.btn-print:hover {
+    background-color: #c19b2e;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+@media print {
+    body {
+        background-color: #fff;
+    }
+    .invoice-container {
+        box-shadow: none;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        max-width: 100%;
+    }
+    .no-print {
+        display: none !important;
+    }
+}

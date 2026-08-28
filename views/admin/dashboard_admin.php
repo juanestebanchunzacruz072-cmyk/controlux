@@ -1,82 +1,11 @@
-﻿<?php
-session_start();
-
-if (!isset($_SESSION['id_usuario']) || $_SESSION['usuario']['id_rol'] != '1') {
-    header("Location: ../auth/login.php");
+<?php
+// Si se accede a esta vista directamente, invocamos el controlador para no romper enlaces existentes.
+if (!isset($total_productos)) {
+    require_once '../../controllers/Admin/DashboardController.php';
+    $controller = new DashboardController();
+    $controller->index();
     exit;
 }
-
-require_once '../../config/database.php';
-
-// Queries para las tarjetas
-// 1. Total Productos
-$stmt = $conn->query("SELECT COUNT(*) as total FROM productos");
-$total_productos = $stmt->fetch()['total'] ?? 0;
-
-// 2. Total Usuarios (no admins)
-$stmt = $conn->query("SELECT COUNT(*) as total FROM usuarios WHERE id_rol = '2'");
-$total_usuarios = $stmt->fetch()['total'] ?? 0;
-
-// 3. Total Pedidos
-// Usamos try/catch por si la tabla 'pedidos' aún no está creada
-$total_pedidos = 7; // Valor quemado temporal o intentamos
-try {
-    $stmt = $conn->query("SELECT COUNT(*) as total FROM pedidos");
-    $total_pedidos = $stmt->fetch()['total'] ?? 0;
-} catch (PDOException $e) {
-    // Si la tabla no existe, dejamos un fallback
-    $total_pedidos = 7;
-}
-
-// 4. Valor total del catálogo
-$valor_catalogo = 0;
-try {
-    $stmt = $conn->query("SELECT SUM(precio * stock) as total FROM productos");
-    $valor_catalogo = $stmt->fetch()['total'] ?? 0;
-} catch (PDOException $e) {
-    // Ignorar
-}
-
-// Productos recientes
-$productos_recientes = [];
-try {
-    // Intentar traer los productos con su categoría, subcategoría e imagen principal
-    $stmt = $conn->query("
-        SELECT p.id_producto, p.nombre, p.precio, p.activo, p.genero, c.nombre as categoria, s.nombre as subcategoria, p.img 
-        FROM productos p 
-        LEFT JOIN categorias c ON p.id_categoria = c.id_categoria 
-        LEFT JOIN subcategoria s ON p.id_subcategoria = s.id_subcategoria
-        ORDER BY p.id_producto DESC LIMIT 4
-    ");
-    $productos_recientes = $stmt->fetchAll();
-} catch (PDOException $e) {
-    // Si las columnas difieren, intentamos query básica
-    try {
-        $stmt = $conn->query("SELECT * FROM productos ORDER BY id_producto DESC LIMIT 4");
-        $productos_recientes = $stmt->fetchAll();
-    } catch (PDOException $e2) {
-        // Ignorar
-    }
-}
-
-// Productos más vendidos
-$productos_mas_vendidos = [];
-try {
-    $stmt = $conn->query("
-        SELECT p.id_producto, p.nombre, p.precio, p.activo, p.genero, c.nombre as categoria, s.nombre as subcategoria, p.img, SUM(dp.cantidad) as total_vendido
-        FROM productos p
-        JOIN detalle_pedidos dp ON p.id_producto = dp.id_producto
-        LEFT JOIN categorias c ON p.id_categoria = c.id_categoria
-        LEFT JOIN subcategoria s ON p.id_subcategoria = s.id_subcategoria
-        GROUP BY p.id_producto, p.nombre, p.precio, p.activo, p.genero, c.nombre, s.nombre, p.img
-        ORDER BY total_vendido DESC
-        LIMIT 4
-    ");
-    $productos_mas_vendidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    // Ignorar si aún no hay ventas
-}
-
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -155,9 +84,6 @@ try {
         <section class="table-container-section">
             <div class="section-header">
                 <h3 class="section-title">PRODUCTOS RECIENTES</h3>
-                <a href="agregar_producto.php" class="btn-add">
-                    <i class="bi bi-plus"></i> AGREGAR
-                </a>
             </div>
             
             <div class="table-container">

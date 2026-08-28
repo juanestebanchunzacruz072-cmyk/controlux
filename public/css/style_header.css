@@ -106,3 +106,9 @@ body {
     font-weight: bold;
     font-size: 1.2rem;
 }
+
+/* Admin Mode */
+.admin-mode .add-to-cart-btn, 
+.admin-mode .cart-icon { 
+    display: none !important; 
+}

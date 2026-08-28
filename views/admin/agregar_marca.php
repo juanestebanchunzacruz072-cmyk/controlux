@@ -19,7 +19,17 @@ $subcategorias = $stmt_sub->fetchAll(PDO::FETCH_ASSOC);
 
 require_once '../../models/Marca.php';
 $marcaModel = new Marca();
-$marcasList = $marcaModel->obtenerTodas();
+
+// Paginación y Filtro
+$filtro_categoria = $_GET['id_categoria'] ?? '';
+$items_por_pagina = 10;
+$pagina_actual = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($pagina_actual < 1) $pagina_actual = 1;
+$offset = ($pagina_actual - 1) * $items_por_pagina;
+
+$resultado = $marcaModel->obtenerPaginadas($filtro_categoria, $items_por_pagina, $offset);
+$marcasList = $resultado['marcas'];
+$total_paginas = ceil($resultado['total'] / $items_por_pagina);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -35,6 +45,7 @@ $marcasList = $marcaModel->obtenerTodas();
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="../../public/css/style_formularios_admin.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="../../public/css/style_productos_admin.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="../../public/css/pagination.css?v=<?php echo time(); ?>">
 </head>
 <body>
 
@@ -51,6 +62,27 @@ $marcasList = $marcaModel->obtenerTodas();
                 </button>
             </div>
         </header>
+
+        <section class="filters-section mt-4 mb-4" style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid var(--border, #eaeaea);">
+            <h4 class="mb-3" style="font-size: 1rem; color: var(--text-gray, #6c757d); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 0; margin-bottom: 1.5rem;"><i class="bi bi-funnel"></i> Filtrar Marcas</h4>
+            <form method="GET" action="agregar_marca.php" style="display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 250px;">
+                    <label for="id_categoria" style="display: block; font-size: 0.8rem; font-weight: 700; color: #555; margin-bottom: 8px; text-transform: uppercase;">Por Categoría</label>
+                    <select id="id_categoria" name="id_categoria" style="width: 100%; padding: 12px 15px; border-radius: 6px; border: 1px solid #ddd; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; outline: none; cursor: pointer;">
+                        <option value="">Todas las categorías</option>
+                        <?php foreach ($categorias as $cat): ?>
+                            <option value="<?php echo $cat['id_categoria']; ?>" <?php echo ($filtro_categoria == $cat['id_categoria']) ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($cat['nombre']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" style="padding: 12px 20px; border-radius: 6px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: var(--gold, #D4AF37); color: #111; font-size: 0.9rem; transition: background 0.3s;"><i class="bi bi-search"></i> Filtrar</button>
+                    <a href="agregar_marca.php" style="padding: 12px 20px; border-radius: 6px; border: 1px solid #ccc; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #fff; color: #333; text-decoration: none; font-size: 0.9rem; transition: background 0.3s;"><i class="bi bi-x-circle"></i> Limpiar</a>
+                </div>
+            </form>
+        </section>
 
         <!-- Modal de Agregar Marca -->
         <div id="modalAgregarMarca" class="modal" tabindex="-1" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
@@ -158,6 +190,34 @@ $marcasList = $marcaModel->obtenerTodas();
                 </table>
             </div>
         </section>
+
+        <!-- Paginación -->
+        <?php if (isset($total_paginas) && $total_paginas > 1): ?>
+            <nav aria-label="Navegación de marcas" class="mb-4">
+                <ul class="custom-pagination">
+                    <?php 
+                        $query_string = $_GET;
+                        unset($query_string['page']);
+                        $base_url = '?' . http_build_query($query_string) . (!empty($query_string) ? '&' : '');
+                    ?>
+                    <li class="<?php echo $pagina_actual <= 1 ? 'disabled' : ''; ?>">
+                        <a class="page-link" href="<?php echo $base_url; ?>page=<?php echo $pagina_actual - 1; ?>">&laquo; Anterior</a>
+                    </li>
+                    
+                    <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
+                        <li class="<?php echo $pagina_actual == $i ? 'active' : ''; ?>">
+                            <a class="page-link" href="<?php echo $base_url; ?>page=<?php echo $i; ?>">
+                                <?php echo $i; ?>
+                            </a>
+                        </li>
+                    <?php endfor; ?>
+                    
+                    <li class="<?php echo $pagina_actual >= $total_paginas ? 'disabled' : ''; ?>">
+                        <a class="page-link" href="<?php echo $base_url; ?>page=<?php echo $pagina_actual + 1; ?>">Siguiente &raquo;</a>
+                    </li>
+                </ul>
+            </nav>
+        <?php endif; ?>
 
         <!-- Modal de Edición de Marca -->
         <div id="modalEditarMarca" class="modal" tabindex="-1" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(5px);">

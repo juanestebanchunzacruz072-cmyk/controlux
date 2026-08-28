@@ -1,4 +1,4 @@
-﻿<!-- Custom Footer CSS -->
+<!-- Custom Footer CSS -->
 <link href="/controlux/public/css/style_footer.css" rel="stylesheet">
 
 <!-- Footer -->
@@ -75,7 +75,7 @@
       </div>
       <div class="modal-footer" style="border-top: none;">
         <button type="button" class="btn btn-outline-dark fw-bold" data-bs-dismiss="modal">Volver</button>
-        <button type="button" class="btn btn-gold fw-bold" id="modalAddToCartBtn">
+        <button type="button" class="btn btn-gold fw-bold" id="modalAddToCartBtn" data-bs-dismiss="modal">
             <i class="bi bi-cart-plus me-2"></i> Agregar al carrito
         </button>
       </div>

@@ -1,0 +1,40 @@
+/* Estilos personalizados para paginación sin depender de Bootstrap global */
+.custom-pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+    margin: 25px 0 10px 0;
+    gap: 8px;
+}
+.custom-pagination li {
+    margin: 0;
+}
+.custom-pagination .page-link {
+    display: block;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    color: #555;
+    background-color: #fff;
+    font-weight: 600;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+}
+.custom-pagination .page-link:hover {
+    background-color: #f8f9fa;
+    border-color: var(--gold, #D4AF37);
+    color: #111;
+}
+.custom-pagination .active .page-link {
+    background-color: var(--gold, #D4AF37);
+    border-color: var(--gold, #D4AF37);
+    color: #111;
+}
+.custom-pagination .disabled .page-link {
+    color: #aaa;
+    pointer-events: none;
+    background-color: #f9f9f9;
+    border-color: #eee;
+}

@@ -89,6 +89,9 @@ class PedidoClienteController
             
             $this->pedidoModel->getConexion()->commit();
             
+            // Guardar el ID del pedido para la factura
+            $_SESSION['ultimo_pedido'] = $id_pedido;
+            
             // Limpiar el carrito de la sesión
             unset($_SESSION['carrito_temporal']);
             

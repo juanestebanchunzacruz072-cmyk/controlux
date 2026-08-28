@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 
 if (!isset($_SESSION['id_usuario']) || $_SESSION['usuario']['id_rol'] != '1') {
@@ -8,14 +8,28 @@ if (!isset($_SESSION['id_usuario']) || $_SESSION['usuario']['id_rol'] != '1') {
 
 require_once '../../config/database.php';
 
-// Fetch users (role 2)
+// Paginación
+$items_por_pagina = 10;
+$pagina_actual = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($pagina_actual < 1) $pagina_actual = 1;
+$offset = ($pagina_actual - 1) * $items_por_pagina;
+
 $usuarios = [];
+$total_paginas = 1;
+
 try {
+    // Contar total
+    $stmt_count = $conn->query("SELECT COUNT(*) FROM usuarios WHERE id_rol = '2'");
+    $total_usuarios = $stmt_count->fetchColumn();
+    $total_paginas = ceil($total_usuarios / $items_por_pagina);
+
+    // Fetch users (role 2)
     $stmt = $conn->query("
         SELECT id_usuario, nombre, apellido, correo, telefono, direccion, ciudad, fecha_registro
         FROM usuarios 
         WHERE id_rol = '2'
         ORDER BY fecha_registro DESC
+        LIMIT $items_por_pagina OFFSET $offset
     ");
     $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -34,6 +48,7 @@ try {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="../../public/css/style_dashboard_admin.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="../../public/css/style_productos_admin.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="../../public/css/pagination.css?v=<?php echo time(); ?>">
 </head>
 <body>
 
@@ -150,6 +165,35 @@ try {
                     </tbody>
                 </table>
             </div>
+
+            <!-- Paginación -->
+            <?php if (isset($total_paginas) && $total_paginas > 1): ?>
+                <nav aria-label="Navegación de usuarios" class="mt-4 mb-2">
+                    <ul class="custom-pagination">
+                        <?php 
+                            $query_string = $_GET;
+                            unset($query_string['page']);
+                            $base_url = '?' . http_build_query($query_string) . (!empty($query_string) ? '&' : '');
+                        ?>
+                        <li class="<?php echo $pagina_actual <= 1 ? 'disabled' : ''; ?>">
+                            <a class="page-link" href="<?php echo $base_url; ?>page=<?php echo $pagina_actual - 1; ?>">&laquo; Anterior</a>
+                        </li>
+                        
+                        <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
+                            <li class="<?php echo $pagina_actual == $i ? 'active' : ''; ?>">
+                                <a class="page-link" href="<?php echo $base_url; ?>page=<?php echo $i; ?>">
+                                    <?php echo $i; ?>
+                                </a>
+                            </li>
+                        <?php endfor; ?>
+                        
+                        <li class="<?php echo $pagina_actual >= $total_paginas ? 'disabled' : ''; ?>">
+                            <a class="page-link" href="<?php echo $base_url; ?>page=<?php echo $pagina_actual + 1; ?>">Siguiente &raquo;</a>
+                        </li>
+                    </ul>
+                </nav>
+            <?php endif; ?>
+
         </section>
     </main>
 
