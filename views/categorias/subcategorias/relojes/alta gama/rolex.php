@@ -1,4 +1,4 @@
-<?php 
+﻿<?php 
 require_once '../../../../../models/Producto.php';
 include '../../../../layouts/header.php'; 
 
@@ -11,11 +11,12 @@ try {
 ?>
 
 <section class="container my-5">
-    <a href="../altagama.php" class="btn btn-outline-dark" style="margin-bottom: 20px; display: inline-block; font-weight: 600; font-size: 1.1rem; padding: 10px 20px;">
+    <div class="header-cat-container d-flex align-items-center justify-content-center position-relative mb-4">
+    <a href="../altagama.php" class="btn btn-outline-dark btn-volver position-absolute start-0" style="font-weight: 600; font-size: 1.1rem; padding: 10px 20px; z-index: 10;">
         <i class="bi bi-arrow-left"></i> Volver
     </a>
-    
-    <h2 class="text-center mb-5">Rolex</h2>
+    <h2 class="text-center m-0">Rolex</h2>
+</div>
 
     <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4 justify-content-center mt-2">
         <?php if (empty($productos)): ?>

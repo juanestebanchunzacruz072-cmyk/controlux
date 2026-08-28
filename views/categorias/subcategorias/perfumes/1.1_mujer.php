@@ -1,4 +1,4 @@
-<?php 
+﻿<?php 
 require '../../../../config/database.php';
 include '../../../layouts/header.php'; 
 
@@ -24,11 +24,12 @@ try {
 
 <!-- Content Section -->
 <section class="container my-5">
-    <a href="perfumes_mujer.php" class="btn btn-outline-dark" style="margin-bottom: 20px; display: inline-block; font-weight: 600; font-size: 1.1rem; padding: 10px 20px; z-index: 10;">
+    <div class="header-cat-container d-flex align-items-center justify-content-center position-relative mb-4">
+    <a href="perfumes_mujer.php" class="btn btn-outline-dark btn-volver position-absolute start-0" style="font-weight: 600; font-size: 1.1rem; padding: 10px 20px; z-index: 10;">
         <i class="bi bi-arrow-left"></i> Volver
     </a>
-    
-    <h2 class="text-center mb-5 mt-4" style="font-weight: 700; padding-top: 20px;">Perfumes 1.1 <span style="color: var(--gold, #D4AF37);">Mujer</span></h2>
+    <h2 class="text-center m-0">Perfumes 1.1 <span style="color: var(--gold, #D4AF37);">Mujer</span></h2>
+</div>
 
     <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4 mt-2">
         <?php if (empty($productos)): ?>
