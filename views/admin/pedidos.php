@@ -48,6 +48,19 @@ try {
     $stmt = $conn->prepare($sql);
     $stmt->execute($params);
     $pedidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Obtener detalles (productos) para cada pedido
+    foreach ($pedidos as &$pedido) {
+        $stmt_det = $conn->prepare("
+            SELECT dp.cantidad, dp.precio_unitario, pr.nombre, pr.referencia, s.nombre as subcategoria
+            FROM detalle_pedidos dp
+            JOIN productos pr ON dp.id_producto = pr.id_producto
+            LEFT JOIN subcategoria s ON pr.id_subcategoria = s.id_subcategoria
+            WHERE dp.id_pedido = ?
+        ");
+        $stmt_det->execute([$pedido['id_pedido']]);
+        $pedido['detalles'] = $stmt_det->fetchAll(PDO::FETCH_ASSOC);
+    }
 } catch (PDOException $e) {
     $error = "No se pudieron cargar los pedidos. " . $e->getMessage();
 }
@@ -78,48 +91,7 @@ try {
 <body>
 
     <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-brand">
-            <h2>JC URBAN</h2>
-            <p>PANEL DE ADMINISTRACIÓN</p>
-        </div>
-        
-        <div class="sidebar-menu">
-            <div class="menu-category">PRINCIPAL</div>
-            <a href="dashboard_admin.php" class="menu-item">
-                <i class="bi bi-grid-1x2-fill"></i> DASHBOARD
-            </a>
-            
-            <div class="menu-category">CATÁLOGO</div>
-            <a href="productos.php" class="menu-item">
-                <i class="bi bi-box-seam"></i> PRODUCTOS
-            </a>
-            <a href="agregar_marca.php" class="menu-item">
-                <i class="bi bi-tags"></i> AGREGAR MARCA
-            </a>
-            
-            <div class="menu-category">GESTIÓN</div>
-            <a href="usuarios.php" class="menu-item">
-                <i class="bi bi-people"></i> USUARIOS
-            </a>
-            <a href="pedidos.php" class="menu-item active">
-                <i class="bi bi-bag-check"></i> PEDIDOS
-            </a>
-        </div>
-        
-        <div class="sidebar-footer">
-            <div class="admin-profile">
-                <div class="admin-avatar">A</div>
-                <div class="admin-info">
-                    <h6>Administrador</h6>
-                    <p><?php echo htmlspecialchars($_SESSION['usuario']['correo'] ?? 'admin@jcurban.com'); ?></p>
-                </div>
-            </div>
-            <a href="../../controllers/Auth/logout.php" class="logout-btn" title="Cerrar sesión">
-                <i class="bi bi-box-arrow-right"></i>
-            </a>
-        </div>
-    </aside>
+    <?php include '../layouts/sidebar_admin.php'; ?>
 
     <!-- Main Content -->
     <main class="main-content">
@@ -189,17 +161,34 @@ try {
                                     </span>
                                 </td>
                                 <td>
-                                    <form action="../../controllers/Admin/PedidoController.php?accion=cambiarEstado" method="POST" style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 5px; margin: 0; padding: 0;">
-                                        <input type="hidden" name="id_pedido" value="<?php echo $p['id_pedido']; ?>">
-                                        <select name="id_estado" class="select-estado" style="margin: 0; flex-shrink: 1;">
-                                            <?php foreach ($estados as $est): ?>
-                                                <option value="<?php echo $est['id_estado']; ?>" <?php echo ($est['id_estado'] == $p['id_estado']) ? 'selected' : ''; ?>>
-                                                    <?php echo htmlspecialchars($est['nombre']); ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <button type="submit" class="btn-update" style="margin: 0; flex-shrink: 0;"><i class="bi bi-check2"></i></button>
-                                    </form>
+                                    <div style="display: flex; gap: 10px; align-items: center;">
+                                        <form action="../../controllers/Admin/PedidoController.php?accion=cambiarEstado" method="POST" style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 5px; margin: 0; padding: 0;">
+                                            <input type="hidden" name="id_pedido" value="<?php echo $p['id_pedido']; ?>">
+                                            <select name="id_estado" class="select-estado" style="margin: 0; flex-shrink: 1;">
+                                                <?php foreach ($estados as $est): ?>
+                                                    <?php $disabled = ($est['id_estado'] < $p['id_estado']) ? 'disabled' : ''; ?>
+                                                    <option value="<?php echo $est['id_estado']; ?>" <?php echo ($est['id_estado'] == $p['id_estado']) ? 'selected' : ''; ?> <?php echo $disabled; ?>>
+                                                        <?php echo htmlspecialchars($est['nombre']); ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                            <button type="submit" class="btn-update" style="margin: 0; flex-shrink: 0;" title="Actualizar estado"><i class="bi bi-check2"></i></button>
+                                        </form>
+                                        
+                                        <button type="button" class="btn btn-sm btn-info btn-ver-detalles" 
+                                            style="padding: 4px 10px; border-radius: 4px; display: flex; align-items: center; justify-content: center; background-color: #111; border: none; color: white;" 
+                                            title="Ver Detalles"
+                                            data-id="<?php echo $p['id_pedido']; ?>"
+                                            data-detalles='<?php echo json_encode($p['detalles']); ?>'>
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+
+                                        <?php if ($p['id_estado'] == 1): ?>
+                                            <button type="button" class="btn btn-sm" onclick="confirmarEliminar(<?php echo $p['id_pedido']; ?>)" title="Eliminar Pedido" style="padding: 4px 10px; border-radius: 4px; display: flex; align-items: center; justify-content: center; background-color: #dc3545; border: none; color: white;">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
@@ -237,6 +226,41 @@ try {
             <?php endif; ?>
 
         </section>
+
+        <!-- Modal de Detalles del Pedido -->
+        <div id="modalDetallesPedido" class="modal-overlay">
+            <div class="modal-custom" style="max-width: 650px;">
+                <button type="button" onclick="document.getElementById('modalDetallesPedido').style.display = 'none'" class="close-btn"><i class="bi bi-x-lg"></i></button>
+                <h2 style="font-family: 'Montserrat', sans-serif; font-weight: 800; margin-bottom: 20px; font-size: 1.5rem; color: #111;">DETALLES DEL PEDIDO <span id="modal-pedido-id" style="color: var(--gold, #D4AF37);"></span></h2>
+                
+                <div class="table-container" style="border: 1px solid #eee; border-radius: 8px; padding: 0;">
+                    <table class="table" style="margin: 0; width: 100%;">
+                        <thead style="background-color: #f8f9fa;">
+                            <tr>
+                                <th style="padding: 12px 15px; font-size: 0.85rem;">PRODUCTO / REF</th>
+                                <th style="padding: 12px 15px; font-size: 0.85rem; text-align: center;">CANT.</th>
+                                <th style="padding: 12px 15px; font-size: 0.85rem; text-align: right;">PRECIO UNIT.</th>
+                                <th style="padding: 12px 15px; font-size: 0.85rem; text-align: right;">SUBTOTAL</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modal-productos-list">
+                            <!-- Los productos se inyectarán aquí vía JS -->
+                        </tbody>
+                        <tfoot>
+                            <tr style="background-color: #f8f9fa; font-weight: bold;">
+                                <td colspan="3" style="text-align: right; padding: 15px;">TOTAL:</td>
+                                <td id="modal-total-price" style="text-align: right; padding: 15px; color: var(--gold, #D4AF37); font-size: 1.1rem;"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                
+                <div style="margin-top: 25px; display: flex; justify-content: flex-end;">
+                    <button type="button" onclick="document.getElementById('modalDetallesPedido').style.display = 'none'" style="padding: 10px 20px; background-color: #111; color: #fff; border: none; border-radius: 4px; font-weight: 600; cursor: pointer;">Cerrar</button>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <?php
@@ -255,5 +279,64 @@ try {
         unset($_SESSION['alert']);
     }
     ?>
+    <script>
+    document.querySelectorAll('.btn-ver-detalles').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const detalles = JSON.parse(this.getAttribute('data-detalles') || '[]');
+            
+            document.getElementById('modal-pedido-id').innerText = '#' + id.toString().padStart(5, '0');
+            
+            const tbody = document.getElementById('modal-productos-list');
+            tbody.innerHTML = '';
+            
+            let total = 0;
+            
+            if (detalles.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">No hay productos en este pedido.</td></tr>';
+            } else {
+                detalles.forEach(item => {
+                    const subtotal = item.cantidad * item.precio_unitario;
+                    total += subtotal;
+                    
+                    const subcatText = item.subcategoria ? ' | ' + item.subcategoria : '';
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="padding: 12px 15px;">
+                            <strong>${item.nombre}</strong><br>
+                            <small class="text-muted">Ref: ${item.referencia}${subcatText}</small>
+                        </td>
+                        <td style="padding: 12px 15px; text-align: center;">${item.cantidad}</td>
+                        <td style="padding: 12px 15px; text-align: right;">$${parseInt(item.precio_unitario).toLocaleString('es-CO')}</td>
+                        <td style="padding: 12px 15px; text-align: right; font-weight: 600;">$${subtotal.toLocaleString('es-CO')}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+            
+            document.getElementById('modal-total-price').innerText = '$' + total.toLocaleString('es-CO');
+            document.getElementById('modalDetallesPedido').style.display = 'flex';
+        });
+    });
+
+    function confirmarEliminar(id) {
+        Swal.fire({
+            title: '¿Eliminar Pedido?',
+            text: "El pedido #" + id.toString().padStart(5, '0') + " será eliminado permanentemente de la base de datos.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            background: '#111',
+            color: '#fff'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '../../controllers/Admin/PedidoController.php?accion=eliminar&id=' + id;
+            }
+        })
+    }
+    </script>
 </body>
 </html>

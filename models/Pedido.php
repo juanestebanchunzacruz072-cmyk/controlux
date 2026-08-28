@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/../config/database.php';
 
 class Pedido
@@ -30,6 +30,34 @@ class Pedido
         $stmt->bindParam(':id_estado', $id_estado, PDO::PARAM_INT);
         $stmt->bindParam(':id_pedido', $id_pedido, PDO::PARAM_INT);
         return $stmt->execute();
+    }
+
+    public function obtenerEstadoActual(int $id_pedido)
+    {
+        $stmt = $this->conn->prepare("SELECT id_estado FROM pedidos WHERE id_pedido = ?");
+        $stmt->execute([$id_pedido]);
+        return $stmt->fetchColumn();
+    }
+
+    public function eliminarPedido(int $id_pedido)
+    {
+        try {
+            $this->conn->beginTransaction();
+            
+            // Primero eliminar detalles por clave foránea
+            $stmt = $this->conn->prepare("DELETE FROM detalle_pedidos WHERE id_pedido = ?");
+            $stmt->execute([$id_pedido]);
+            
+            // Luego eliminar pedido
+            $stmt2 = $this->conn->prepare("DELETE FROM pedidos WHERE id_pedido = ?");
+            $stmt2->execute([$id_pedido]);
+            
+            $this->conn->commit();
+            return true;
+        } catch (PDOException $e) {
+            $this->conn->rollBack();
+            return false;
+        }
     }
 
     public function getConexion()

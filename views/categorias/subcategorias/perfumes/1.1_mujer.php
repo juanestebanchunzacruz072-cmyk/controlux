@@ -1,4 +1,4 @@
-﻿<?php 
+<?php 
 require '../../../../config/database.php';
 include '../../../layouts/header.php'; 
 
@@ -23,8 +23,8 @@ try {
 ?>
 
 <!-- Content Section -->
-<section class="container my-5 position-relative">
-    <a href="perfumes_mujer.php" class="btn btn-outline-dark position-absolute" style="top: 0; left: 15px; font-weight: 600; font-size: 1.1rem; padding: 10px 20px; z-index: 10;">
+<section class="container my-5">
+    <a href="perfumes_mujer.php" class="btn btn-outline-dark" style="margin-bottom: 20px; display: inline-block; font-weight: 600; font-size: 1.1rem; padding: 10px 20px; z-index: 10;">
         <i class="bi bi-arrow-left"></i> Volver
     </a>
     

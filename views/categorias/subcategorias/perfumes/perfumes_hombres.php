@@ -1,8 +1,8 @@
-﻿<?php include '../../../layouts/header.php'; ?>
+<?php include '../../../layouts/header.php'; ?>
 
 <!-- Categories Section -->
 <section id="categorias" class="categories-section container my-5 position-relative">
-    <a href="../../perfumes.php" class="btn btn-outline-dark position-absolute" style="top: 0; left: 15px; font-weight: 600; font-size: 1.1rem; padding: 10px 20px;">
+    <a href="../../perfumes.php" class="btn btn-outline-dark" style="margin-bottom: 20px; display: inline-block; font-weight: 600; font-size: 1.1rem; padding: 10px 20px;">
         <i class="bi bi-arrow-left"></i> Volver
     </a>
     

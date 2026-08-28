@@ -174,3 +174,28 @@ button.swal2-confirm {
     color: #ffffff !important;
     border: none !important;
 }
+
+/* =========================================
+   MEDIA QUERIES (RESPONSIVE) - SUBCATEGORÍAS
+   ========================================= */
+@media (max-width: 768px) {
+    /* Arreglo para el botón Volver y el Título en subcategorías */
+    .container.position-relative > .btn-outline-dark.position-absolute,
+    .container.position-relative > .btn-outline-dark {
+        position: static !important;
+        display: inline-block !important;
+        margin-bottom: 20px !important;
+    }
+    
+    .container.position-relative > h2.text-center {
+        margin-top: 0 !important;
+        font-size: 1.8rem;
+    }
+
+    .categories-grid {
+        gap: 30px;
+    }
+    .category-title {
+        font-size: 1.5rem;
+    }
+}

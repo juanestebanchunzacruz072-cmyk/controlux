@@ -76,3 +76,14 @@
     padding: 15px;
     margin-top: 15px;
 }
+
+@media (max-width: 576px) {
+    .step-name {
+        font-size: 0.6rem;
+    }
+    .order-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}

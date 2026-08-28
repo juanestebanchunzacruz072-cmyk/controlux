@@ -217,3 +217,9 @@
     background: #ccc;
     border-radius: 5px;
 }
+
+@media (max-width: 576px) {
+    #cartOffcanvas {
+        width: 100% !important;
+    }
+}

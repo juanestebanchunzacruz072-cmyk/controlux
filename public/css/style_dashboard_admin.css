@@ -34,6 +34,7 @@ body {
     left: 0;
     top: 0;
     z-index: 1000;
+    transition: transform 0.3s ease;
 }
 
 .sidebar-brand {
@@ -323,6 +324,7 @@ body {
     box-shadow: 0 4px 15px rgba(0,0,0,0.03);
     border: 1px solid var(--border);
     overflow: hidden;
+    overflow-x: auto; /* Para scroll en móviles */
 }
 
 .table {
@@ -386,6 +388,66 @@ body {
         grid-template-columns: repeat(2, 1fr);
     }
 }
+
+@media (max-width: 768px) {
+    /* Ocultar el sidebar y mostrar botón */
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    .sidebar.show {
+        transform: translateX(0);
+    }
+    #mobile-menu-toggle {
+        display: block !important;
+    }
+    /* El main content ocupa todo */
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 4rem 1rem 1rem;
+    }
+    /* Apilar elementos del Topbar */
+    .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    .topbar form {
+        width: 100%;
+        flex-wrap: wrap;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Forzar scroll horizontal en tablas y evitar que el texto se aplaste */
+    .table td, .table th {
+        white-space: nowrap;
+    }
+    
+    /* Apilar headers de sección (Botón Agregar Producto) */
+    .section-header {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 15px;
+        text-align: center;
+    }
+    .section-header .btn-add {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    /* Filtros más compactos en móvil */
+    .filters-section form {
+        flex-direction: column;
+    }
+    .filters-section form > div {
+        width: 100%;
+    }
+}
+
 /* SweetAlert Global Overrides */
 div.swal2-popup {
     background-color: #ffffff !important;

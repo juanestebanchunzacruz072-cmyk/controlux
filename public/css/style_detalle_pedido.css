@@ -92,7 +92,11 @@ body {
     letter-spacing: 0.5px;
     box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
     transition: all 0.3s ease;
-    white-space: nowrap;
+    white-space: normal;
+    word-wrap: break-word;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .btn-confirm:hover {
     background-color: #b5952f;
@@ -116,7 +120,11 @@ body {
     margin-top: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    white-space: nowrap;
+    white-space: normal;
+    word-wrap: break-word;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .btn-back:hover {
     background-color: var(--black);

@@ -1,8 +1,8 @@
-﻿<?php include '../../../layouts/header.php'; ?>
+<?php include '../../../layouts/header.php'; ?>
 
 <!-- Content Section -->
 <section class="container my-5 position-relative text-center" style="min-height: 50vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-    <a href="perfumes_mujer.php" class="btn btn-outline-dark position-absolute" style="top: 0; left: 15px; font-weight: 600; font-size: 1.1rem; padding: 10px 20px;">
+    <a href="perfumes_mujer.php" class="btn btn-outline-dark" style="margin-bottom: 20px; display: inline-block; font-weight: 600; font-size: 1.1rem; padding: 10px 20px;">
         <i class="bi bi-arrow-left"></i> Volver
     </a>
     

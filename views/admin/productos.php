@@ -433,9 +433,9 @@ try {
     </script>
 
     <!-- Modal Agregar Producto -->
-    <div id="modalAgregarProducto" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
-        <div style="background: white; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; border-radius: 12px; padding: 30px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-            <button type="button" onclick="cerrarModalProducto()" style="position: absolute; top: 20px; right: 20px; background: transparent; border: none; font-size: 1.5rem; cursor: pointer; color: #666;"><i class="bi bi-x-lg"></i></button>
+    <div id="modalAgregarProducto" class="modal-overlay">
+        <div class="modal-custom">
+            <button type="button" onclick="cerrarModalProducto()" class="close-btn"><i class="bi bi-x-lg"></i></button>
             <h2 style="font-family: 'Montserrat', sans-serif; font-weight: 800; margin-bottom: 20px; font-size: 1.5rem;">AGREGAR PRODUCTO</h2>
             
             <form action="../../controllers/Admin/ProductoController.php?accion=guardar" method="POST" enctype="multipart/form-data">
@@ -449,7 +449,7 @@ try {
                     <input type="text" name="referencia" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Montserrat', sans-serif;; box-sizing: border-box;" placeholder="Ej: REF-12345" required>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div class="modal-form-grid">
                     <div>
                         <label style="display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem;">Categoría *</label>
                         <select name="id_categoria" id="modal_id_categoria" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Montserrat', sans-serif;; box-sizing: border-box;" required>
@@ -467,7 +467,7 @@ try {
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div class="modal-form-grid">
                     <div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
                             <label style="font-weight: 600; margin: 0; font-size: 0.9rem;">Marca *</label>
@@ -492,7 +492,7 @@ try {
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div class="modal-form-grid">
                     <div>
                         <label style="display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem;">Precio (COP) *</label>
                         <input type="number" name="precio" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Montserrat', sans-serif; outline: none;; box-sizing: border-box;" placeholder="Ej: 4500000" min="0" required>
@@ -606,9 +606,9 @@ try {
     </script>
 
     <!-- Modal Editar Producto -->
-    <div id="modalEditarProducto" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
-        <div style="background: white; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; border-radius: 12px; padding: 30px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-            <button type="button" onclick="cerrarModalEditarProducto()" style="position: absolute; top: 20px; right: 20px; background: transparent; border: none; font-size: 1.5rem; cursor: pointer; color: #666;"><i class="bi bi-x-lg"></i></button>
+    <div id="modalEditarProducto" class="modal-overlay">
+        <div class="modal-custom">
+            <button type="button" onclick="cerrarModalEditarProducto()" class="close-btn"><i class="bi bi-x-lg"></i></button>
             <h2 style="font-family: 'Montserrat', sans-serif; font-weight: 800; margin-bottom: 20px; font-size: 1.5rem;">EDITAR PRODUCTO</h2>
             
             <form action="../../controllers/Admin/ProductoController.php?accion=editar" method="POST" enctype="multipart/form-data">
@@ -624,7 +624,7 @@ try {
                     <input type="text" name="referencia" id="edit_referencia" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Montserrat', sans-serif; box-sizing: border-box;" required>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div class="modal-form-grid">
                     <div>
                         <label style="display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem;">Categoría *</label>
                         <select name="id_categoria" id="edit_id_categoria" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Montserrat', sans-serif; box-sizing: border-box;" required>
@@ -642,7 +642,7 @@ try {
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div class="modal-form-grid">
                     <div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
                             <label style="font-weight: 600; margin: 0; font-size: 0.9rem;">Marca *</label>
@@ -667,7 +667,7 @@ try {
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div class="modal-form-grid">
                     <div>
                         <label style="display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem;">Precio (COP) *</label>
                         <input type="number" name="precio" id="edit_precio" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Montserrat', sans-serif; outline: none; box-sizing: border-box;" min="0" required>

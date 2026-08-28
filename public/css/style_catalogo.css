@@ -220,3 +220,29 @@ body {
     border-color: var(--gold, #D4AF37) !important;
     color: #000 !important;
 }
+
+@media (max-width: 768px) {
+    .seccion-hero-categorias {
+        padding: 30px 15px;
+    }
+    .titulo-producto {
+        font-size: 0.95rem;
+    }
+    .precio-producto {
+        font-size: 1.1rem;
+    }
+    .marca-logo {
+        font-size: 1.2rem;
+    }
+    
+    /* Arreglo para el botón Volver y el Título en subcategorías */
+    .container.position-relative > .btn-outline-dark.position-absolute {
+        position: static !important;
+        display: inline-block !important;
+        margin-bottom: 20px !important;
+    }
+    
+    .container.position-relative > h2.text-center {
+        margin-top: 0 !important;
+    }
+}

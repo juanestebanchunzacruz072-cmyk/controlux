@@ -107,3 +107,33 @@ body {
         display: none !important;
     }
 }
+
+/* Responsividad para móviles */
+@media (max-width: 768px) {
+    .invoice-container {
+        padding: 15px;
+        margin: 15px;
+    }
+    .invoice-title {
+        font-size: 1.8rem;
+    }
+    .invoice-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    .invoice-header .text-end {
+        text-align: left !important;
+        margin-top: 15px;
+    }
+    .company-details h4, .client-details h4 {
+        font-size: 1rem;
+    }
+    .client-details {
+        text-align: left !important;
+        margin-top: 25px;
+    }
+    .table-invoice th, .table-invoice td {
+        padding: 10px 5px;
+        font-size: 0.85rem;
+    }
+}

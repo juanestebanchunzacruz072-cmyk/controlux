@@ -70,3 +70,66 @@
     border-radius: 50%;
     font-size: 1.2rem;
 }
+
+/* ==========================================
+   MODALES (Responsive Design)
+   ========================================== */
+.modal-overlay {
+    display: none; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: rgba(0,0,0,0.6); 
+    z-index: 9999; 
+    justify-content: center; 
+    align-items: center; 
+    backdrop-filter: blur(5px);
+}
+
+.modal-custom {
+    background: white; 
+    width: 90%; 
+    max-width: 800px; 
+    max-height: 90vh; 
+    overflow-y: auto; 
+    border-radius: 12px; 
+    padding: 30px; 
+    position: relative; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.modal-custom .close-btn {
+    position: absolute; 
+    top: 20px; 
+    right: 20px; 
+    background: transparent; 
+    border: none; 
+    font-size: 1.5rem; 
+    cursor: pointer; 
+    color: #666;
+}
+
+.modal-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+/* Responsividad para móviles */
+@media (max-width: 768px) {
+    .modal-custom {
+        padding: 20px 15px; /* Reducir padding en celular */
+        width: 95%;
+    }
+    .modal-custom h2 {
+        font-size: 1.25rem !important;
+        margin-bottom: 15px !important;
+    }
+    .modal-form-grid {
+        grid-template-columns: 1fr; /* 1 sola columna en celular */
+        gap: 10px;
+    }
+}

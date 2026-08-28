@@ -31,9 +31,10 @@ $cliente = $stmt_cliente->fetch(PDO::FETCH_ASSOC);
 
 // Obtener los productos del pedido
 $stmt_detalles = $conn->prepare("
-    SELECT dp.cantidad, dp.precio_unitario, dp.subtotal, pr.nombre, pr.referencia
+    SELECT dp.cantidad, dp.precio_unitario, dp.subtotal, pr.nombre, pr.referencia, c.nombre as categoria
     FROM detalle_pedidos dp
     JOIN productos pr ON dp.id_producto = pr.id_producto
+    LEFT JOIN categorias c ON pr.id_categoria = c.id_categoria
     WHERE dp.id_pedido = ?
 ");
 $stmt_detalles->execute([$id_pedido]);
@@ -98,21 +99,22 @@ $detalles = $stmt_detalles->fetchAll(PDO::FETCH_ASSOC);
         <table class="table-invoice">
             <thead>
                 <tr>
-                    <th>Ref.</th>
                     <th>Producto</th>
                     <th class="text-center">Cant.</th>
                     <th class="text-end">Precio Unit.</th>
-                    <th class="text-end">Subtotal</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($detalles as $item): ?>
                 <tr>
-                    <td class="text-muted" style="font-size: 0.85rem;"><?php echo htmlspecialchars($item['referencia']); ?></td>
-                    <td class="fw-bold"><?php echo htmlspecialchars($item['nombre']); ?></td>
-                    <td class="text-center"><?php echo $item['cantidad']; ?></td>
-                    <td class="text-end">$<?php echo number_format($item['precio_unitario'], 0, ',', '.'); ?></td>
-                    <td class="text-end fw-bold">$<?php echo number_format($item['subtotal'], 0, ',', '.'); ?></td>
+                    <td>
+                        <strong class="fw-bold"><?php echo htmlspecialchars($item['nombre']); ?></strong><br>
+                        <small class="text-muted" style="font-size: 0.8rem;">
+                            <?php echo htmlspecialchars($item['categoria'] ?? 'General'); ?> | Ref: <?php echo htmlspecialchars($item['referencia']); ?>
+                        </small>
+                    </td>
+                    <td class="text-center" style="vertical-align: middle;"><?php echo $item['cantidad']; ?></td>
+                    <td class="text-end" style="vertical-align: middle;">$<?php echo number_format($item['precio_unitario'], 0, ',', '.'); ?></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
