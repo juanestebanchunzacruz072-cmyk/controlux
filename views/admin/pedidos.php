@@ -10,6 +10,7 @@ require_once '../../config/database.php';
 
 // Filtros y Paginación
 $filtro_fecha = $_GET['fecha'] ?? '';
+$filtro_id_pedido = trim($_GET['id_pedido'] ?? '');
 $items_por_pagina = 10;
 $pagina_actual = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 if ($pagina_actual < 1) $pagina_actual = 1;
@@ -25,6 +26,10 @@ try {
     if (!empty($filtro_fecha)) {
         $where .= " AND DATE(p.fecha_pedido) = :fecha";
         $params[':fecha'] = $filtro_fecha;
+    }
+    if (!empty($filtro_id_pedido)) {
+        $where .= " AND p.id_pedido = :id_pedido";
+        $params[':id_pedido'] = $filtro_id_pedido;
     }
 
     // Contar total
@@ -99,12 +104,13 @@ try {
             <h1 style="margin: 0;">GESTIÓN DE PEDIDOS</h1>
             
             <!-- Filtro compacto en el topbar -->
-            <form method="GET" action="pedidos.php" style="display: flex; gap: 8px; align-items: center; margin-left: auto; margin-right: 15px;">
+            <form method="GET" action="pedidos.php" style="display: flex; gap: 8px; align-items: center; margin-left: auto; margin-right: 15px; flex-wrap: wrap; justify-content: flex-end;">
+                <input type="number" name="id_pedido" value="<?php echo htmlspecialchars($filtro_id_pedido); ?>" placeholder="Cod. Pedido..." style="padding: 8px 12px; border-radius: 6px; border: 1px solid #ddd; font-family: 'Montserrat', sans-serif; font-size: 0.85rem; outline: none; height: 38px; box-sizing: border-box; width: 120px;">
                 <input type="date" name="fecha" value="<?php echo htmlspecialchars($filtro_fecha); ?>" style="padding: 8px 12px; border-radius: 6px; border: 1px solid #ddd; font-family: 'Montserrat', sans-serif; font-size: 0.85rem; outline: none; height: 38px; box-sizing: border-box;">
                 <button type="submit" title="Buscar" style="height: 38px; padding: 0 15px; border-radius: 6px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; background-color: var(--gold, #D4AF37); color: #111; transition: background 0.3s;">
                     <i class="bi bi-search"></i>
                 </button>
-                <?php if(!empty($filtro_fecha)): ?>
+                <?php if(!empty($filtro_fecha) || !empty($filtro_id_pedido)): ?>
                 <a href="pedidos.php" title="Limpiar filtro" style="height: 38px; padding: 0 15px; border-radius: 6px; border: 1px solid #ccc; font-weight: 700; cursor: pointer; display: flex; align-items: center; background-color: #fff; color: #333; text-decoration: none; transition: background 0.3s;">
                     <i class="bi bi-x-circle"></i>
                 </a>

@@ -9,6 +9,7 @@ if (!isset($_SESSION['id_usuario']) || $_SESSION['usuario']['id_rol'] != '1') {
 require_once '../../config/database.php';
 
 // Filtros GET
+$filtro_busqueda = trim($_GET['busqueda'] ?? '');
 $filtro_categoria = $_GET['id_categoria'] ?? '';
 $filtro_subcategoria = $_GET['id_subcategoria'] ?? '';
 $filtro_marca = $_GET['id_marca'] ?? '';
@@ -68,6 +69,11 @@ try {
         $sql_count .= " AND p.id_marca = :id_marca";
         $params[':id_marca'] = $filtro_marca;
     }
+    if (!empty($filtro_busqueda)) {
+        $sql_productos .= " AND (p.nombre LIKE :busqueda OR p.referencia LIKE :busqueda)";
+        $sql_count .= " AND (p.nombre LIKE :busqueda OR p.referencia LIKE :busqueda)";
+        $params[':busqueda'] = '%' . $filtro_busqueda . '%';
+    }
     
     // Ejecutar conteo
     $stmt_count = $conn->prepare($sql_count);
@@ -122,6 +128,10 @@ try {
         <section class="filters-section mt-4 mb-4" style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid var(--border, #eaeaea); margin-bottom: 2rem;">
             <h4 class="mb-3" style="font-size: 1rem; color: var(--text-gray, #6c757d); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 0; margin-bottom: 1.5rem;"><i class="bi bi-funnel"></i> Filtros de Búsqueda</h4>
             <form method="GET" action="productos.php" style="display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 250px;">
+                    <label for="busqueda" style="display: block; font-size: 0.8rem; font-weight: 700; color: #555; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Buscar Producto</label>
+                    <input type="text" id="busqueda" name="busqueda" value="<?php echo htmlspecialchars($filtro_busqueda); ?>" placeholder="Nombre o referencia..." style="width: 100%; padding: 12px 15px; border-radius: 6px; border: 1px solid #ddd; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; color: #333; outline: none; box-sizing: border-box;">
+                </div>
                 <div style="flex: 1; min-width: 200px;">
                     <label for="id_categoria" style="display: block; font-size: 0.8rem; font-weight: 700; color: #555; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Categoría</label>
                     <select id="id_categoria" name="id_categoria" style="width: 100%; padding: 12px 15px; border-radius: 6px; border: 1px solid #ddd; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; color: #333; background-color: #f9f9f9; outline: none; cursor: pointer;; box-sizing: border-box;">

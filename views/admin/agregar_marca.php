@@ -21,13 +21,14 @@ require_once '../../models/Marca.php';
 $marcaModel = new Marca();
 
 // Paginación y Filtro
+$filtro_busqueda = trim($_GET['busqueda'] ?? '');
 $filtro_categoria = $_GET['id_categoria'] ?? '';
 $items_por_pagina = 10;
 $pagina_actual = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 if ($pagina_actual < 1) $pagina_actual = 1;
 $offset = ($pagina_actual - 1) * $items_por_pagina;
 
-$resultado = $marcaModel->obtenerPaginadas($filtro_categoria, $items_por_pagina, $offset);
+$resultado = $marcaModel->obtenerPaginadas($filtro_categoria, $items_por_pagina, $offset, $filtro_busqueda);
 $marcasList = $resultado['marcas'];
 $total_paginas = ceil($resultado['total'] / $items_por_pagina);
 ?>
@@ -67,6 +68,10 @@ $total_paginas = ceil($resultado['total'] / $items_por_pagina);
             <h4 class="mb-3" style="font-size: 1rem; color: var(--text-gray, #6c757d); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 0; margin-bottom: 1.5rem;"><i class="bi bi-funnel"></i> Filtrar Marcas</h4>
             <form method="GET" action="agregar_marca.php" style="display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap;">
                 <div style="flex: 1; min-width: 250px;">
+                    <label for="busqueda" style="display: block; font-size: 0.8rem; font-weight: 700; color: #555; margin-bottom: 8px; text-transform: uppercase;">Buscar Marca</label>
+                    <input type="text" id="busqueda" name="busqueda" value="<?php echo htmlspecialchars($filtro_busqueda); ?>" placeholder="Nombre de la marca..." style="width: 100%; padding: 12px 15px; border-radius: 6px; border: 1px solid #ddd; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; outline: none; box-sizing: border-box;">
+                </div>
+                <div style="flex: 1; min-width: 200px;">
                     <label for="id_categoria" style="display: block; font-size: 0.8rem; font-weight: 700; color: #555; margin-bottom: 8px; text-transform: uppercase;">Por Categoría</label>
                     <select id="id_categoria" name="id_categoria" style="width: 100%; padding: 12px 15px; border-radius: 6px; border: 1px solid #ddd; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; outline: none; cursor: pointer;">
                         <option value="">Todas las categorías</option>

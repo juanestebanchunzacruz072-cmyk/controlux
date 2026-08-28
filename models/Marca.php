@@ -80,7 +80,7 @@ class Marca
         }
     }
 
-    public function obtenerPaginadas($id_categoria = null, $limit = 10, $offset = 0)
+    public function obtenerPaginadas($id_categoria = null, $limit = 10, $offset = 0, $filtro_busqueda = null)
     {
         try {
             $params = [];
@@ -89,6 +89,11 @@ class Marca
             if (!empty($id_categoria)) {
                 $where .= " AND m.id_marca IN (SELECT id_marca FROM marcas_categorias WHERE id_categoria = ?)";
                 $params[] = $id_categoria;
+            }
+
+            if (!empty($filtro_busqueda)) {
+                $where .= " AND m.nombre LIKE ?";
+                $params[] = "%" . trim($filtro_busqueda) . "%";
             }
 
             // Contar total
